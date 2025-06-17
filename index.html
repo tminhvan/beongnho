@@ -413,5 +413,50 @@
         });
     })();
     </script>
+    <script>
+(function() {
+    // Hàm gửi chiều cao, được cải tiến để gửi cả chiều cao của scrollHeight và offsetHeight
+    function sendHeight() {
+        // Lấy chiều cao thực tế của toàn bộ nội dung trang
+        const height = document.body.scrollHeight;
+        
+        // Gửi thông điệp chứa chiều cao tới trang cha (Blogger)
+        // Dấu '*' cho phép gửi tới bất kỳ domain nào
+        parent.postMessage({ frameHeight: height }, '*');
+        
+        // In ra console để chúng ta biết nó đã gửi chiều cao bao nhiêu (hữu ích để debug)
+        console.log('GitHub Page: Đã gửi chiều cao', height, 'px');
+    }
+
+    // Gửi chiều cao khi trang tải xong
+    window.onload = function() {
+        sendHeight();
+        // Gửi lại sau một khoảng thời gian ngắn để chắc chắn mọi thứ đã render
+        setTimeout(sendHeight, 500);
+        setTimeout(sendHeight, 1500);
+    };
+
+    // Gửi lại chiều cao khi kích thước cửa sổ thay đổi
+    window.onresize = sendHeight;
+
+    // SỬ DỤNG MUTATIONOBSERVER: Đây là cách hiện đại và đáng tin cậy nhất.
+    // Nó sẽ theo dõi mọi thay đổi trong cấu trúc của trang (ví dụ khi có thêm các thanh Gantt)
+    // và sẽ tự động gọi lại hàm sendHeight.
+    const observer = new MutationObserver(function(mutations) {
+        sendHeight();
+    });
+
+    // Cấu hình observer để theo dõi các thẻ con, và các thay đổi trong cây cấu trúc
+    const config = {
+        attributes: true,
+        childList: true,
+        subtree: true
+    };
+
+    // Bắt đầu quan sát toàn bộ body của trang
+    observer.observe(document.body, config);
+
+})();
+</script>
 </body>
 </html>

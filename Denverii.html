@@ -1,0 +1,379 @@
+<style>
+  #header { position: fixed !important; top: 0 !important; left: 0 !important; width: 100% !important; z-index: 1000 !important; background: white !important; }
+  body { padding-top: 70px !important; font-family: sans-serif; }
+  .chart-container { width: 100%; max-width: 100%; margin: 20px auto; position: relative; overflow-x: auto; padding: 0 10px; box-sizing: border-box; }
+  .input-container { text-align: center; margin: 20px 0; padding: 10px; background: #f5f5f5; border-radius: 5px; }
+  .timeline, .timeline2, .timeline3, .timeline4, .timeline5 { height: 12px; background-color: #eee; position: relative; margin: 15px 0; }
+  .age-line { position: absolute; height: 100%; width: 2px; background-color: #ffeb3b; z-index: 10; top: 0; display: none; }
+  .timeline-ticks, .timeline2-ticks, .timeline3-ticks, .timeline4-ticks, .timeline5-ticks { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+  .tick { position: absolute; top: 0; height: 100%; border-left: 1px solid #999; }
+  .tick.tickmonth { height: 200%; border-left: 1px solid #000; }
+  .tick-label { position: absolute; top: 100%; transform: translateX(-50%); font-size: 0.9em; color: #333; }
+  .gantt-chart { position: relative; padding-top: 15px; display: flex; flex-direction: column-reverse; }
+  .gantt-bar { position: relative; height: 28px; border-radius: 5px; color: black; text-align: center; line-height: 28px; font-size: 0.95em; margin-top: 6px; border: 1px solid black; overflow: visible; white-space: nowrap; box-sizing: border-box; }
+  .gantt-bar.extra-margin { margin-top: 35px; }
+  .legend { margin: 25px 0; text-align: center; display: flex; justify-content: center; flex-wrap: wrap; padding: 10px; }
+  .legend-item { display: inline-flex; align-items: center; margin: 5px 15px; }
+  .legend-color { width: 22px; height: 22px; border-radius: 50%; margin-right: 8px; border: 1px solid black; }
+  .legend-text { font-size: 1em; }
+  @media (max-width: 768px) {
+    .gantt-bar { font-size: 0.85em; height: 24px; line-height: 24px; }
+    .tick-label { font-size: 0.8em; }
+  }
+</style>
+
+<h1 style="text-align: center; margin-bottom: 30px;">Biểu đồ Denver II</h1>
+<div class="chart-container">
+  <div class="input-container">
+    <label for="ageInput">Nhập số tháng tuổi: </label>
+    <input id="ageInput" min="0" step="0.1" style="padding: 5px;" type="number" value="0" />
+    <button id="updateAgeBtn" style="padding: 5px 10px; margin-left: 10px;">Cập nhật</button>
+  </div>
+  <div class="age-line" id="ageLine"></div>
+  <div class="timeline">
+    <div class="timeline-ticks"></div>
+  </div>
+  <div class="gantt-chart"></div>
+  <div class="timeline2">
+    <div class="timeline2-ticks"></div>
+  </div>
+</div>
+<div class="legend"></div>
+
+
+<script>
+// BẮT ĐẦU KHÔNG GIAN RIÊNG TƯ (IIFE)
+(function() {
+
+    // Toàn bộ code được đặt trong không gian này để tránh xung đột
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const data = [
+            [
+                "CỬ ĐỘNG ĐỀU-0 tháng-0,5 tháng-0,5 tháng",
+                "NÂNG ĐẦU-0 tháng-0,6 tháng-0,6 tháng",
+                "NÂNG ĐẦU 45 ĐỘ-0,925 tháng-1,8 tháng-2,7 tháng",
+                "NÂNG ĐẦU 90 ĐỘ-1,5 tháng-2,9 tháng-3,6 tháng",
+                "NGỒI GIỮ VỮNG ĐẦU-1,6 tháng-3,0 tháng-3,7 tháng",
+                "ĐỠ ĐỨNG BẰNG 2 CHÂN-1,7 tháng-3,6 tháng-4,4 tháng",
+                "CHỐNG TAY NÂNG NGỰC-2,6 tháng-4,0 tháng-4,6 tháng",
+                "R LẬT-2,1 tháng-4,3 tháng-5,4 tháng",
+                "KÉO NGỒI KHÔNG NGÃ RA SAU-2,8 tháng-4,1 tháng-6,2 tháng",
+                "NGỒI KHÔNG ĐỠ-5,4 tháng-6,3 tháng-6,8 tháng",
+                "ĐỨNG VỊN TAY-6,5 tháng-7,8 tháng-8,5 tháng",
+                "VỊN ĐỨNG DẬY-7,8 tháng-9,1 tháng-9,7 tháng",
+                "R TỰ NGỒI LÊN-7,6 tháng-9,1 tháng-9,9 tháng",
+                "ĐỨNG VỮNG 2 GIÂY-9,4 tháng-10,9 tháng-11,6 tháng",
+                "ĐỨNG MỘT MÌNH-10,4 tháng-12,5 tháng-13,7 tháng",
+                "CÚI XUỐNG RỒI ĐỨNG LÊN-11,0 tháng-13,4 tháng-14,6 tháng",
+                "ĐI VỮNG-11,1 tháng-13,6 tháng-14,9 tháng",
+                "R ĐI GIẬT LÙI-12,3 tháng-15,2 tháng-16,6 tháng",
+                "CHẠY-13,8 tháng-17,8 tháng-19,9 tháng",
+                "(R 27) BƯỚC LÊN BẬC THANG-14,1 tháng-19,1 tháng-21,6 tháng",
+                "ĐÁ BÓNG VỀ PHÍA TRƯỚC-15,9 tháng-20,8 tháng-23,2 tháng",
+                "NHẢY TẠI CHỖ-21,4 tháng-2,2 năm-2,4 năm",
+                "28 NÉM BÓNG CAO TAY-17,1 tháng-23,8 tháng-2,9 năm",
+                "NHẢY XA-2,4 năm-20,3 tháng-3,2 năm",
+                "ĐỨNG 1 CHÂN 1 GIÂY-2,3 năm-2,8 năm-3,3 năm",
+                "ĐỨNG 1 CHÂN 2 GIÂY-2,7 năm-3,5 năm-4 năm",
+                "NHẢY LÒ CÒ-3,25 năm-3,85 năm-4,25 năm",
+                "ĐỨNG 1 CHÂN 3 GIÂY-2,75 năm-3,85 năm-4,7 năm",
+                "ĐỨNG 1 CHÂN 4 GIÂY-3,5 năm-4,5 năm-5,15 năm",
+                "ĐỨNG 1 CHÂN 5 GIÂY-3,75 năm-4,85 năm-5,45 năm",
+                "30 ĐI NỐI GÓT-4 năm-5,15 năm-5,7 năm",
+                "ĐỨNG 1 CHÂN 6 GIÂY-4,2 năm-5,3 năm -6 năm",
+              ],
+              [
+                "PHẢN ỨNG VỚI TIẾNG CHUÔNG-0 tháng-0,01 tháng-0,65 tháng",
+                "PHÁT ÂM-0 tháng-0,01 tháng-3,3 tháng",
+                "R Ô Ô, A A-0,675 tháng-1,6 tháng-2,7 tháng",
+                "R CƯỜI THÀNH TIẾNG-1,3 tháng-2,5 tháng-3,1 tháng",
+                "R REO CƯỜI-1,2 tháng-2,8 tháng-4,3 tháng",
+                "17 QUAY THEO LÚC LẮC-2,8 tháng-4,7 tháng-5,6 tháng",
+                "HƯỚNG VỀ TIẾNG NÓI-3,6 tháng-5,6 tháng-6,6 tháng",
+                "R SỬ DỤNG ÂM TIẾT ĐƠN-4,7 tháng-6,6 tháng-7,5 tháng",
+                "R BẮT CHƯỚC ÂM NÓI-3,0 tháng-6,0 tháng-8,8 tháng",
+                "R BABA MAMA KHÔNG RÕ-5,7 tháng-7,7 tháng-9,1 tháng",
+                "R BA BA MA MA ÂM TIẾT TRÊN 3 LẦN-5,8 tháng-7,4 tháng-10,1 tháng",
+                "R NÓI BẬP BẸ-5,7 tháng-8,3 tháng-12,1 tháng",
+                "R BABA MAMA RÕ VỚI BỐ MẸ-6,9 tháng-11,0 tháng-13,3 tháng",
+                "R NÓI 1 TỪ-9,7 tháng-13,3 tháng-15,0 tháng",
+                "R NÓI 2 TỪ ĐƠN-10,7 tháng-14,6 tháng-16,5 tháng",
+                "R NÓI 3 TỪ ĐƠN-11,5 tháng-15,8 tháng-18,0 tháng",
+                "R NÓI 6 TỪ ĐƠN-13,7 tháng-18,8 tháng-21,4 tháng",
+                "18 CHỈ HAI HÌNH-17,3 tháng-20,9 tháng-23,6 tháng",
+                "R NÓI CÂU 2 TỪ-17,2 tháng-22,1 tháng-25,5 tháng",
+                "18 GỌI TÊN 1 HÌNH-18,5 tháng-24 tháng-26 tháng",
+                "19 CHỈ 6 BỘ PHẬN CƠ THỂ-18,8 tháng-22,4 tháng-2,1 năm",
+                "18 CHỈ 4 TRANH-20,0 tháng-2,1 năm-2,5 năm",
+                "NÓI CÓ NỘI DUNG HIỂU ½-17,2 tháng-2,1 năm-2,9 năm",
+                "18 GỌI TÊN 4 BỨC TRANH-23,3 tháng-2,6 năm-2,9 năm",
+                "20 HIỂU HAI HÀNH ĐỘNG-23,5 tháng-2,6 năm-3,2 năm",
+                "21 HIỂU HAI TÍNH TỪ-2,5 năm-3,0 năm-3,6 năm",
+                "GỌI TÊN 1 MÀU-2,3 năm-3,2 năm-3,81 năm",
+                "22 BIẾT SỬ DỤNG 2 ĐỒ VẬT-2,65 năm-3,25 năm-3,85 năm",
+                "23 ĐẾM 1 KHỐI-2,85 năm-3,21 năm-3,95 năm",
+                "22 BIẾT DÙNG 2 ĐỒ VẬT-2,8 năm-3,26 năm-4,15 năm",
+                "20 HIỂU 4 HOẠT ĐỘNG-2,45 năm-3,2 năm-4 năm",
+                "HIỂU HẾT LỜI TRẺ NÓI-23,5 tháng-3,26 năm-4,26 năm",
+                "24 HIỂU 4 GIỚI TỪ-2,5 năm-3,8 năm-4,75 năm",
+                "GỌI TÊN 4 MÀU-3 năm-4,3 năm-4,8 năm",
+                "25 ĐỊNH NGHĨA 5 TỪ-3,25 năm-4,51 năm-5,27 năm",
+                "21 HIỂU MỆT LẠNH NÓNG (3 TÍNH TỪ)-2,85 năm-3,8 năm-5,4 năm",
+                "23 ĐẾM 5 KHỐI-4,125 năm-5 năm-5,3 năm",
+                "26 HIỂU TỪ TRÁI NGHĨA-3,65 năm-5 năm-5,7 năm",
+                "25 ĐỊNH NGHĨA 7 TỪ-3,95 năm-5,26 năm-6 năm",
+              ],
+              [
+                "5 NHÌN TỚI ĐƯỜNG GIỮA-0,3 tháng-0,3 tháng-1,7 tháng",
+                "5 NHÌN QUÁ GIỮA ĐƯỜNG-0,5 tháng-2 tháng-3 tháng",
+                "6 NẮM QUẢ LẮC LẮC-2,6 tháng-3,7 tháng-3,9 tháng",
+                "NẮM HAI BÀN TAY-2,2 tháng-2,9 tháng-4,0 tháng",
+                "5 NHÌN 180 ĐỘ-2,2 tháng-3,8 tháng-4,5 tháng",
+                "NHÌN HẠT LẠC-2,8 tháng-4,4 tháng-5,2 tháng",
+                "VỚI ĐỒ CHƠI (NHẶT LÊN)-4,3 tháng-5,2 tháng-5,6 tháng",
+                "7 NHÌN TÚM LEN RƠI-4,9 tháng-6,5 tháng-7,2 tháng",
+                "CÀO LẤY HẠT LẠC-5,7 tháng-6,6 tháng-7,3 tháng",
+                "8 CHUYỀN TAY MỘT KHỐI-5,1 tháng-6,8 tháng-7,7 tháng",
+                "HAI TAY CẦM HAI KHỐI-5,7 tháng-7,1 tháng-9,1 tháng",
+                "9 NHẶT BẰNG NGÓN CÁI-7,2 tháng-9,2 tháng-12,0 tháng",
+                "R ĐẬP HAI KHỐI VÀO NHAU-6,7 tháng-10,0 tháng-10,9 tháng",
+                "CHO KHỐI VÀO CỐC-9,8 tháng-12,4 tháng-13,8 tháng",
+                "VẼ NGỆCH NGOẠC-11,7 tháng-14,8 tháng-16,3 tháng",
+                "DỐC HẠT LẠC RA KHỎI LỌ-12,8 tháng-15,7 tháng-19,4 tháng",
+                "XẾP CHỒNG 2 KHỐI-13,5 tháng-17,1 tháng-20,6 tháng",
+                "XẾP CHỒNG 4 KHỐI-16,5 tháng-22,6 tháng-23,8 tháng",
+                "XẾP CHỒNG 6 KHỐI-19,6 tháng-2,0 năm-2,6 năm",
+                "VẠCH ĐƯỜNG THẲNG-2,1 năm-2,8 năm-3,2 năm",
+                "XẾP CHỒNG 8 KHỐI-23,7 tháng-2,7 năm-3,5 năm",
+                "11 XOAY NGÓN TAY TRÁI-2,5 năm-3,3 năm-3,6 năm",
+                "12 BẮT CHƯỚC VẼ HÌNH TRÒN-3,2 năm-3,7 năm-4,1 năm",
+                "16 VẼ NGƯỜI 3 PHẦN-3,3 năm-4,15 năm-4,75 năm",
+                "14 BẮT CHƯỚC VẼ DẤU CỘNG-3,3 năm-4,15 năm-4,4 năm",
+                "13 CHỈ ĐƯỜNG THẲNG DÀI HƠN-3 năm-4,1 năm-5,1 năm",
+                "15 BẮT CHƯỚC VẼ HÌNH VUÔNG-4,02 năm-5 năm-5,35 năm",
+                "16 VẼ NGƯỜI 6 PHẦN-4,05 năm-5,1 năm-5,45 năm",
+                "SAO CHÉP HÌNH VUÔNG-4,55 năm-5,4 năm-6 năm",
+              ],
+              [
+                "NHÌN MẶT-0 THÁNG-0 tháng-1,5 tháng",
+                "CƯỜI ĐÁP-0,55 tháng-1,2 tháng-1,8 tháng",
+                "1 MỈM CƯỜI TỰ NHIÊN-0,65 tháng-1,4 tháng-2,1 tháng",
+                "(R 2) NHÌN TAY-0,85 tháng-3,1 tháng-4,0 tháng",
+                "VỚI ĐỒ CHƠI-4,1 tháng-5,3 tháng-5,9 tháng",
+                "R TỰ ĂN-4,8 tháng-5,9 tháng-6,5 tháng",
+                "R BẮT CHƯỚC VỖ TAY-7,1 tháng-10,4 tháng-11,4 tháng",
+                "R THỂ HIỆN Ý MUỐN-7,2 tháng-11,0 tháng-12,9 tháng",
+                "R VẪY TAY TẠM BIỆT-6,7 tháng-9,2 tháng-14,0 tháng",
+                "CHƠI VỚI NGƯỜI KIỂM TRA-9,5 tháng-11,9 tháng-15,7 tháng",
+                "BĂT CHƯỚC VIỆC NHÀ-10,1 tháng-12,5 tháng-16,0 tháng",
+                "R UỐNG NƯỚC BẰNG CỐC-8,8 tháng-15,2 tháng-17,1 tháng",
+                "GIÚP VIỆC NHÀ ĐƠN GIẢN-12,6 tháng-15,8 tháng-17,3 tháng",
+                "R DÙNG THÌA-12,8 tháng-17,5 tháng-19,9 tháng",
+                "R CỞI QUẦN ÁO-13,3 tháng-20,4 tháng-23,9 tháng",
+                "CHO BÚP BÊ ĂN-14,8 tháng-19,2 tháng-2,0 năm",
+                "R BIẾT MẶC QUẦN ÁO-20,5 tháng-2,2 năm-2,5 năm",
+                "R ĐÁNH RĂNG CÓ GIÚP ĐỠ-16,1 tháng-2,2 năm-3,1 năm",
+                "R RỬA VÀ LAU TAY KHÔ-19,2 tháng-2,3 năm-3,1 năm",
+                "GỌI TÊN BẠN-2,2 năm-2,8 năm-3,4 năm",
+                "R MẶC ÁO CHUI-25 tháng-36 tháng-45 tháng",
+                "(R 4) TỰ MẶC QUẦN ÁO-36 tháng-48 tháng-53 tháng",
+                "R CHƠI BÀI-27 tháng-51,5 tháng-59 tháng",
+                "R TỰ ĐÁNH RĂNG-31,5 tháng-50 tháng-62 tháng",
+              ]
+        ];
+
+        const groupColors = ["#4CAF50", "#2196F3", "#FF9800", "#9C27B0"];
+        const chartContainer = document.querySelector('.gantt-chart');
+        const timelineTicks = document.querySelector('.timeline-ticks');
+        const timeline2Ticks = document.querySelector('.timeline2-ticks');
+        const legendContainer = document.querySelector('.legend');
+        const ageLine = document.getElementById('ageLine');
+        const ageInputEl = document.getElementById('ageInput');
+        const updateBtn = document.getElementById('updateAgeBtn');
+
+        function parseTimeToMonths(timeStr) {
+            if (typeof timeStr !== 'string') return 0;
+            const parts = timeStr.trim().split(' ');
+            const value = parseFloat(parts[0].replace(',', '.'));
+            const unit = parts[1];
+            return unit === "năm" ? value * 12 : value;
+        }
+
+        function parseData(dataArray) {
+            return dataArray.map(itemStr => {
+                const parts = itemStr.split('-');
+                const name = parts[0].trim();
+                const q25 = parseTimeToMonths(parts[1]);
+                const q75 = parseTimeToMonths(parts[2]);
+                const q90 = parseTimeToMonths(parts[3]);
+                return { name, q25, q75, q90 };
+            });
+        }
+
+        const allParsedData = data.map(group => parseData(group));
+        let minStart = Infinity;
+        let maxEnd = -Infinity;
+        allParsedData.flat().forEach(item => {
+            minStart = Math.min(minStart, item.q25);
+            maxEnd = Math.max(maxEnd, item.q90);
+        });
+        const totalMonths = Math.ceil(maxEnd);
+
+        const regions = [];
+        const compressedScale = 1 / 3;
+        for (let i = 0; i < 24; i++) {
+            regions.push({ start: i, end: i + 1, scale: i < 18 ? 4.34524 : 4.34524 * 0.5 });
+        }
+        for (let i = 24; i < 36; i++) {
+            regions.push({ start: i, end: i + 1, scale: 4.34524 * compressedScale });
+        }
+        for (let i = 36; i < 72; i++) {
+            regions.push({ start: i, end: i + 1, scale: 4.34524 * compressedScale });
+        }
+        for (let i = 72; i < totalMonths; i++) {
+            regions.push({ start: i, end: i + 1, scale: 4.34524 });
+        }
+
+        function calculateTotalScaledDuration(regions) {
+            return regions.reduce((total, region) => total + (region.end - region.start) * region.scale, 0);
+        }
+
+        function timeToPixels(timeInMonths) {
+            let totalPixels = 0;
+            for (const region of regions) {
+                if (timeInMonths <= region.start) break;
+                const regionStart = region.start;
+                const regionEnd = region.end;
+                if (timeInMonths >= regionEnd) {
+                    totalPixels += (regionEnd - regionStart) * region.scale;
+                } else {
+                    totalPixels += (timeInMonths - regionStart) * region.scale;
+                    break;
+                }
+            }
+            const totalScaledDuration = calculateTotalScaledDuration(regions);
+            return (totalPixels / totalScaledDuration) * 100;
+        }
+
+        const labels = [2, 4, 6, 9, 12, 15, 18, 24, 3, 4, 5, 6];
+        const labelMonths = [2, 4, 6, 9, 12, 15, 18, 24, 36, 48, 60, 72];
+
+        function drawTimeline(ticksContainer) {
+            if (!ticksContainer) return;
+            ticksContainer.innerHTML = '';
+            for (let i = 0; i <= totalMonths; i++) {
+                const tickPosition = timeToPixels(i);
+                const labelIndex = labelMonths.indexOf(i);
+                if (labelIndex !== -1) {
+                    const tick = document.createElement('div');
+                    tick.className = 'tick tickmonth';
+                    tick.style.left = `${tickPosition}%`;
+                    ticksContainer.appendChild(tick);
+                    const tickLabel = document.createElement('span');
+                    tickLabel.className = 'tick-label';
+                    tickLabel.textContent = labels[labelIndex];
+                    tickLabel.style.left = `${tickPosition}%`;
+                    ticksContainer.appendChild(tickLabel);
+                }
+            }
+        }
+
+        function updateAgeLine() {
+            if (!ageInputEl || !ageLine) return;
+            const ageInMonths = parseFloat(ageInputEl.value);
+            if (ageInMonths >= 0) {
+                const position = timeToPixels(ageInMonths);
+                ageLine.style.left = `${position}%`;
+                ageLine.style.display = 'block';
+            } else {
+                ageLine.style.display = 'none';
+            }
+        }
+
+        function drawGanttBarsAndLegend(allData, colors) {
+            if (!chartContainer || !legendContainer) return;
+            chartContainer.innerHTML = '';
+            legendContainer.innerHTML = '';
+
+            allData.forEach((groupData, groupIndex) => {
+                const groupColor = colors[groupIndex % colors.length];
+                groupData.forEach(item => {
+                    const startPos = timeToPixels(item.q25);
+                    const endPos = timeToPixels(item.q90);
+                    const barWidth = endPos - startPos;
+                    if (barWidth <= 0) return;
+                    const whitePercent = ((item.q75 - item.q25) / (item.q90 - item.q25)) * 100;
+                    const bar = document.createElement('div');
+                    bar.className = 'gantt-bar';
+                    if (item.name === "25 ĐỊNH NGHĨA 7 TỪ" || item.name === "SAO CHÉP HÌNH VUÔNG" || item.name === "R TỰ ĐÁNH RĂNG") {
+                        bar.classList.add('extra-margin');
+                    }
+                    bar.textContent = item.name;
+                    bar.style.marginLeft = `${startPos}%`;
+                    bar.style.width = `${barWidth}%`;
+                    bar.style.background = `linear-gradient(to right, white ${whitePercent}%, ${groupColor} ${whitePercent}%, ${groupColor} 100%)`;
+                    chartContainer.appendChild(bar);
+                });
+
+                if (groupIndex === 2) {
+                    const timeline3 = document.createElement('div');
+                    timeline3.className = 'timeline3';
+                    const timeline3Ticks = document.createElement('div');
+                    timeline3Ticks.className = 'timeline3-ticks';
+                    timeline3.appendChild(timeline3Ticks);
+                    chartContainer.appendChild(timeline3);
+                    drawTimeline(timeline3Ticks);
+                }
+                if (groupIndex === 1) {
+                    const timeline4 = document.createElement('div');
+                    timeline4.className = 'timeline4';
+                    const timeline4Ticks = document.createElement('div');
+                    timeline4Ticks.className = 'timeline4-ticks';
+                    timeline4.appendChild(timeline4Ticks);
+                    chartContainer.appendChild(timeline4);
+                    drawTimeline(timeline4Ticks);
+                }
+                if (groupIndex === 0) {
+                    const timeline5 = document.createElement('div');
+                    timeline5.className = 'timeline5';
+                    const timeline5Ticks = document.createElement('div');
+                    timeline5Ticks.className = 'timeline5-ticks';
+                    timeline5.appendChild(timeline5Ticks);
+                    chartContainer.appendChild(timeline5);
+                    drawTimeline(timeline5Ticks);
+                }
+            });
+
+            const groupNames = ["Vận động thô", "Ngôn ngữ", "Vận động tinh tế thích ứng", "Cá nhân - xã hội"];
+            groupColors.forEach((color, index) => {
+                const legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+                const legendColor = document.createElement('span');
+                legendColor.className = 'legend-color';
+                legendColor.style.backgroundColor = color;
+                legendItem.appendChild(legendColor);
+                const legendText = document.createElement('span');
+                legendText.className = 'legend-text';
+                legendText.textContent = groupNames[index];
+                legendItem.appendChild(legendText);
+                legendContainer.appendChild(legendItem);
+            });
+        }
+
+        if(updateBtn && ageInputEl) {
+             drawGanttBarsAndLegend(allParsedData, groupColors);
+             drawTimeline(timelineTicks);
+             drawTimeline(timeline2Ticks);
+             updateAgeLine();
+             updateBtn.addEventListener('click', updateAgeLine);
+             ageInputEl.addEventListener('keypress', function(e) {
+                 if (e.key === 'Enter') {
+                     updateAgeLine();
+                 }
+             });
+        }
+    });
+
+})(); // KẾT THÚC KHÔNG GIAN RIÊNG TƯ
+</script>

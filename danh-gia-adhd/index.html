@@ -8,471 +8,589 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* --- TOÀN BỘ PHẦN CSS NGOẠI TRỪ @media print GIỮ NGUYÊN NHƯ BAN ĐẦU --- */
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f8f9fa;
-            color: #333;
-        }
-        .container {
-            max-width: 850px;
-            margin: 20px auto;
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            font-size: 22px;
-            color: #0056b3;
-            margin-bottom: 25px;
-        }
-        .info-section {
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-        }
-        .info-section label {
+        /* --- CSS Bổ Sung Cho Chức Năng Lưu Ảnh Giống Bản In --- */
+        body.force-print-view .container { }
+        body.force-print-view table { border: 1px solid #000 !important; font-size: 9pt; }
+        body.force-print-view th, body.force-print-view td { border: 1px solid #000 !important; padding: 5px; background-color: transparent !important; }
+        body.force-print-view th { background-color: #eee !important; font-weight: bold; color: #000 !important; }
+        body.force-print-view td:first-child { text-align: left !important; }
+        .temp-checkmark-for-capture { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 14pt; font-weight: bold; color: #000; display: block; line-height: 1; pointer-events: none; z-index: 5; }
+        #questions-body td:has(> input[type="radio"]) { position: relative; }
+        .hide-radio-for-capture { opacity: 0 !important; position: absolute !important; left: -9999px; pointer-events: none; }
+        /* --- Kết thúc CSS Bổ Sung --- */
+        /* --- CSS Chung --- */
+        body { font-family: 'Roboto', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f8f9fa; color: #333; font-size: 15px; }
+        .container { max-width: 850px; margin: 20px auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; font-size: 22px; color: #0056b3; margin-bottom: 25px; }
+        /* --- Phần Thông tin Trẻ --- */
+        .info-section { margin-bottom: 30px; padding: 20px; background-color: #e9ecef; border-radius: 5px; }
+        .info-section label { display: inline-block; width: 150px; font-weight: 500; margin-bottom: 10px; vertical-align: middle; }
+        .info-section input[type="text"], .info-section input[type="number"] { padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; margin-bottom: 10px; transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; font-size: 1em; }
+        .info-section input[type="text"]:focus, .info-section input[type="number"]:focus { border-color: #80bdff; outline: 0; box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
+        .info-section input[type="radio"] { margin-right: 5px; vertical-align: middle; }
+        .info-section .gender-label { margin-left: 15px; width: auto; font-weight: normal; }
+        .info-display { display: none; padding: 15px; line-height: 1.6; }
+        .info-display label { font-weight: bold; color: #495057; margin-right: 5px; }
+        .info-display span { margin-left: 5px; }
+        .input-form { display: block; }
+        /* --- Bảng Câu Hỏi --- */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; table-layout: fixed; border: 1px solid #dee2e6; border-radius: 5px; overflow: visible; font-size: 0.95em; }
+        th, td { border: 1px solid #dee2e6; padding: 12px 10px; text-align: center; vertical-align: middle; word-wrap: break-word; }
+        th:first-child, td:first-child { width: 45%; text-align: left; position: relative; /* Vẫn cần cho tooltip desktop */ }
+        th:not(:first-child), td:not(:first-child) { width: 13.75%; }
+        th { background-color: #e9ecef; font-weight: 500; color: #495057; }
+        tbody tr:hover { background-color: #f1f3f5; }
+        td:first-child { cursor: default; }
+        td input[type="radio"] { cursor: pointer; }
+        .selected-row { background-color: #cfe2ff !important; font-weight: 500; }
+        /* --- === CSS TOOLTIP DESKTOP (Trigger Hover Cell HOẶC Hover/Focus Icon) === --- */
+        .tooltip-trigger {
             display: inline-block;
-            width: 150px;
-            font-weight: 500;
-            margin-bottom: 10px;
-            vertical-align: middle;
-        }
-        .info-section input[type="text"],
-        .info-section input[type="number"] {
-            padding: 8px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-        .info-section input[type="text"]:focus,
-        .info-section input[type="number"]:focus {
-            border-color: #80bdff;
-            outline: 0;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
-        .info-section input[type="radio"] {
-            margin-right: 5px;
-            vertical-align: middle;
-        }
-        .info-section .gender-label {
-            margin-left: 15px;
-            width: auto;
+            margin-left: 8px;
             font-weight: normal;
-        }
-        .info-display {
-            display: none; /* Ẩn mặc định, chỉ hiện khi lưu ảnh hoặc in (nếu cần) */
-            padding: 15px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            line-height: 1.6;
-        }
-        .info-display label {
-            font-weight: bold;
-            color: #495057;
-            margin-right: 5px;
-        }
-        .info-display span {
-            margin-left: 5px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-            table-layout: fixed;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        th, td {
-            border: 1px solid #dee2e6;
-            padding: 12px 10px;
+            color: #007bff;
+            cursor: help;
             text-align: center;
+            font-size: 0.9em;
             vertical-align: middle;
-            word-wrap: break-word;
+            user-select: none;
+            outline: none;
         }
-        th:first-child, td:first-child {
-            width: 45%;
-            text-align: left;
-            position: relative; /* Cho tooltip */
+        .tooltip-trigger:focus {
+            color: #0056b3;
+             /* box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); */ /* Optional focus style */
         }
-        th:not(:first-child), td:not(:first-child) {
-            width: 13.75%;
-        }
-        th {
-            background-color: #e9ecef;
-            font-weight: 500;
-            color: #495057;
-        }
-        tbody tr:hover {
-            background-color: #f1f3f5;
-        }
-        td {
-            cursor: pointer;
-        }
-        td input[type="radio"] {
-            cursor: pointer;
-        }
-        .selected-row {
-            background-color: #cfe2ff !important;
-            font-weight: 500;
-        }
-        /* Cải thiện Tooltip */
-        td:first-child:hover::after {
-            content: attr(data-tooltip);
+        .tooltip-text {
+            visibility: hidden;
+            opacity: 0;
             position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            bottom: 105%;
+            z-index: 10;
+            bottom: calc(100% + 5px);
+            left: 10px;
+            transform: translateX(0);
             background-color: #343a40;
             color: white;
             padding: 8px 12px;
             border-radius: 4px;
             width: 350px;
-            z-index: 10;
+            max-width: calc(100vw - 40px);
             white-space: pre-wrap;
             font-size: 13px;
             line-height: 1.5;
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s ease, visibility 0.2s ease;
+            pointer-events: none;
+            transition: opacity 0.2s ease, visibility 0s linear 0.2s;
         }
-        td:first-child:hover::after {
-            opacity: 1;
+        /* Quy tắc hiển thị tooltip DESKTOP */
+        td:first-child:hover .tooltip-text,
+        span.tooltip-trigger:hover + .tooltip-text,
+        span.tooltip-trigger:focus + .tooltip-text
+        {
             visibility: visible;
+            opacity: 1;
+            transition: opacity 0.2s ease;
+        }
+        /* --- === KẾT THÚC CSS TOOLTIP DESKTOP === --- */
+        /* --- Nút Bấm --- */
+        .buttons { text-align: center; margin-top: 20px; }
+        .buttons button { padding: 12px 25px; margin: 0 15px; cursor: pointer; background-color: #6c757d; color: white; border: none; border-radius: 5px; font-size: 15px; font-weight: 500; transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+        .buttons button:hover { background-color: #5a6268; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        /* --- Phần Kết quả --- */
+        #result { margin-top: 30px; padding: 20px; border: 1px solid #cfe2ff; border-radius: 5px; background-color: #e7f1ff; display: none; }
+        #result h3 { margin-top: 0; color: #0056b3; margin-bottom: 15px; }
+        #result p { margin: 8px 0; font-size: 16px; }
+        #result span { font-weight: bold; color: #d63384; }
+        /* --- === CSS Responsive & MOBILE TOOLTIP === --- */
+      @media screen and (max-width: 767px) {
+    body { font-size: 14px; }
+    table thead { display: none; }
+    table, tbody, tr, td { display: block; width: 100% !important; box-sizing: border-box; }
+    table { border: none; font-size: 1em; }
+    tr { border: 1px solid #ccc; border-radius: 5px; margin-bottom: 20px; padding: 0; background-color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    td { 
+        border: none; 
+        border-bottom: 1px dotted #eee; 
+        padding: 10px 5px;
+        position: relative; 
+        min-height: 40px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between;
+        text-align: right; 
+    }
+    td:last-of-type { border-bottom: none; }
+    td::before { 
+        content: attr(data-label); 
+        position: static;
+        width: auto;
+        white-space: normal; 
+        text-align: left; 
+        font-weight: bold; 
+        color: #333; 
+        font-size: 13px; 
+        margin-right: 5px;
+    }
+    td:first-child {
+        padding: 12px 10px;
+        text-align: left;
+        font-weight: bold;
+        font-size: 1.05em;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #ccc;
+        display: block;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        cursor: default;
+    }
+    td:first-child::before { display: none; }
+    td input[type="radio"] { 
+        margin: 0 0 0 5px;
+        transform: scale(1.1); 
+    }
+    .selected-row { background-color: transparent !important; font-weight: normal; }
+    /* Tooltip mobile giữ nguyên */
+    .tooltip-trigger {
+        display: inline-block;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 5px;
+        background-color: #e0e0e0;
+        color: #333;
+        font-size: 0.9em;
+        margin-left: 5px;
+        vertical-align: middle;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        border: 1px solid #bdbdbd;
+    }
+    .tooltip-trigger:focus {
+        outline: 2px solid #007bff;
+        outline-offset: 1px;
+    }
+    .tooltip-text {
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: static !important;
+        display: none;
+        width: auto !important;
+        max-width: none !important;
+        transform: none !important;
+        background-color: #f0f0f0;
+        color: #333;
+        padding: 10px 12px;
+        margin-top: 8px;
+        margin-left: 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: none !important;
+        white-space: pre-wrap;
+        font-size: 13.5px;
+        line-height: 1.6;
+        pointer-events: auto !important;
+        transition: none;
+        font-weight: normal;
+    }
+    .tooltip-text.mobile-visible {
+        display: block !important;
+    }
+    td:first-child:hover .tooltip-text,
+    span.tooltip-trigger:hover + .tooltip-text,
+    span.tooltip-trigger:focus + .tooltip-text {
+        visibility: hidden !important;
+        opacity: 0 !important;
+        display: none !important;
+    }
+    .info-section {
+           padding: 15px; /* Giảm padding một chút nếu cần */
+       }
+       .info-section .input-form div {
+           display: flex;
+           align-items: flex-start; /* Căn lề trên cho label và input */
+           margin-bottom: 12px; /* Tăng khoảng cách giữa các dòng */
+           flex-wrap: wrap; /* Cho phép xuống dòng nếu cần */
+       }
+       .info-section .input-form label {
+           width: 100px; /* Giảm chiều rộng label */
+           flex-shrink: 0;
+           margin-bottom: 5px; /* Thêm khoảng cách dưới label nếu xuống dòng */
+           padding-right: 10px; /* Khoảng cách giữa label và input */
+           box-sizing: border-box;
+           font-size: 14px;
+           line-height: 2; /* Đảm bảo chiều cao tương đương input */
+           vertical-align: middle; /* Căn giữa text label */
+       }
+        /* Label cho radio button thì không cần width cố định */
+       .info-section .input-form div:has(input[type="radio"]) > label:first-of-type {
+           width: 100px; /* Vẫn giữ width cho label "Giới tính:" */
+       }
+       .info-section .input-form input[type="text"],
+       .info-section .input-form input[type="number"] {
+           flex-grow: 1; /* Cho phép input chiếm phần không gian còn lại */
+           width: auto; /* Bỏ width cố định */
+           min-width: 100px; /* Đặt chiều rộng tối thiểu nếu muốn */
+           box-sizing: border-box;
+           margin-bottom: 0;
+           font-size: 14px;
+           padding: 8px 10px; /* Điều chỉnh padding nếu cần */
+           vertical-align: middle; /* Căn giữa input */
+       }
+       /* Input Tuổi có thể đặt max-width nếu muốn nó ngắn hơn */
+       .info-section .input-form input#age-input {
+            max-width: 80px;
+            flex-grow: 0; /* Không cho phép nó lớn ra quá */
+       }
+       /* Căn chỉnh nhóm radio button */
+        .info-section .input-form div:has(input[type="radio"]) {
+            align-items: center; /* Căn giữa các radio button với label */
+        }
+       .info-section .input-form input[type="radio"] {
+           margin-right: 3px;
+           margin-left: 5px; /* Thêm khoảng cách trái cho radio đầu tiên */
+       }
+       .info-section .input-form .gender-label {
+           margin-left: 0; /* Bỏ margin trái cũ */
+           margin-right: 10px; /* Thêm margin phải để tách các option */
+           width: auto;
+           font-size: 14px;
+           line-height: 2; /* Căn với label chính */
+           vertical-align: middle;
+           margin-bottom: 0; /* Bỏ margin-bottom */
+       }
+        /* --- Chỉnh sửa CSS cho #reference-section trên mobile --- */
+        #reference-section {
+            margin-top: 20px;
+            padding-top: 10px;
+        }
+        #reference-section > div { /* Container chứa 2 box trai/gái */
+             display: flex;
+             flex-direction: column; /* Xếp chồng lên nhau theo chiều dọc */
+             gap: 15px; /* Khoảng cách giữa 2 box */
+             /* Bỏ flex-wrap, justify-content */
+        }
+        #reference-section > div > div { /* Các box trai/gái */
+             min-width: 0; /* Bỏ min-width cũ */
+             width: 100%; /* Cho phép chiếm toàn bộ chiều rộng */
+             padding: 12px;
+             box-sizing: border-box; /* Đảm bảo padding không làm tăng kích thước */
+        }
+         #reference-section h5 {
+            font-size: 1.1em; /* Tăng nhẹ cỡ chữ tiêu đề box */
+         }
+         #reference-section ul {
+             padding-left: 18px; /* Giảm thụt lề danh sách */
+         }
+         #reference-section li {
+             font-size: 1em; /* Đảm bảo kích thước chữ dễ đọc */
+             margin-bottom: 4px;
+         }
+}
+    /* --- CSS In ấn --- */
+    @media print {
+        body {
+            background-color: #fff;
+            font-size: 10pt;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            margin: 15mm;
+            padding: 0;
         }
 
-        /* --- CSS ĐÃ CẬP NHẬT CHO BUTTONS --- */
-        .buttons {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .buttons button {
-            padding: 12px 25px;
-            margin: 0 15px;
-            cursor: pointer;
-            background-color: #007bff; /* Màu xanh mặc định */
-            color: white;
+        .container {
+            box-shadow: none;
+            padding: 0;
+            margin: 0;
+            max-width: 100%;
             border: none;
-            border-radius: 5px;
-            font-size: 15px;
-            font-weight: 500;
-            transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
-        .buttons button:hover {
-            background-color: #0056b3;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+
+        .buttons,
+        .input-form,
+        #table-intro,
+        .tooltip-trigger,
+        .tooltip-text {
+            display: none !important;
         }
-        .buttons button:last-child {
-            background-color: #6c757d; /* Màu xám */
+
+        .info-section {
+            background-color: transparent !important;
+            padding: 0 !important;
+            margin-bottom: 20px !important;
+            border: none !important;
+            border-radius: 0 !important;
         }
-        .buttons button:last-child:hover {
-            background-color: #5a6268;
+
+        .info-display {
+            display: block !important;
+            padding: 15px !important;
+            background-color: #e9ecef !important;
+            border: 1px solid #ccc !important;
+            border-radius: 5px !important;
+            color: #333 !important;
+            line-height: 1.6 !important;
         }
-        /* --- KẾT THÚC CSS CẬP NHẬT CHO BUTTONS --- */
+
+        .info-display label {
+            color: #495057 !important;
+            font-weight: bold !important;
+        }
+
+        /* Thêm box cho info-section */
+        .info-section.info-box {
+            border: 1px solid #ccc; /* Thêm viền */
+            padding: 10px; /* Thêm padding */
+            margin-bottom: 20px; /* Thêm margin dưới */
+            border-radius: 5px; /* Thêm bo tròn góc */
+            background-color: #f8f9fa !important; /* Đảm bảo nền trắng hoặc nhẹ */
+        }
+
+        .info-section.info-box .info-display label {
+            display: inline-block; /* Giữ inline để label và span cùng dòng nếu muốn */
+            width: 150px; /* Chiều rộng cho label */
+            font-weight: bold;
+            margin-right: 5px;
+            color: #333 !important;
+        }
+
+        .info-section.info-box .info-display span {
+            display: inline-block; /* Giữ inline với label */
+            color: #000 !important;
+        }
+
+
+        h1 {
+            display: block !important;
+            font-size: 16pt;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #000 !important;
+        }
+
+        table {
+            display: table !important;
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin-bottom: 15px;
+            page-break-inside: auto;
+            font-size: 9pt;
+            table-layout: fixed !important; /* Đặt lại fixed để duy trì độ rộng cột đã set */
+        }
+
+        thead {
+            display: table-header-group !important;
+        }
+
+        tbody {
+            display: table-row-group !important;
+        }
+
+        tr {
+            display: table-row !important;
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        th,
+        td {
+            display: table-cell !important;
+            border: 1px solid #000 !important;
+            padding: 5px;
+            vertical-align: middle;
+            background-color: transparent !important;
+        }
+
+        th {
+            font-weight: bold !important; /* In đậm tiêu đề bảng */
+            background-color: #eee !important;
+            color: #000 !important;
+            text-align: center !important;
+        }
+
+        td:first-child {
+            text-align: left !important; /* Căn trái cho cột câu hỏi */
+            width: 45% !important;
+        }
+
+        td:not(:first-child) {
+            text-align: center !important; /* Căn giữa cho các cột điểm */
+            width: 13.75% !important;
+        }
+
+        .selected-row {
+            background-color: #fff !important;
+            font-weight: normal !important;
+        }
+
+        /* --- Xử lý dấu 'x' trong bản in --- */
+        td input[type="radio"] {
+            display: none !important; /* Ẩn các nút radio */
+        }
+
+        td:has(input[type="radio"]:checked)::after {
+            content: 'x';
+            font-size: 14pt;
+            font-weight: bold;
+            color: #000;
+            display: block; /* Đảm bảo 'x' hiển thị */
+            line-height: 1;
+            /* Đặt vị trí tuyệt đối để 'x' hiển thị chính xác */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Đảm bảo nội dung các ô không được chọn vẫn trống rỗng */
+        td:not(:first-child):not(:has(input[type="radio"]:checked)):empty {
+            /* Không làm gì cả, mặc định sẽ trống */
+        }
+
 
         #result {
-            margin-top: 30px;
-            padding: 20px;
-            border: 1px solid #cfe2ff;
-            border-radius: 5px;
-            background-color: #e7f1ff;
-            display: none; /* Ẩn ban đầu */
+            display: block !important;
+            border: 1px solid #000 !important;
+            background-color: #e7f1ff !important;
+            color: #000 !important;
+            margin-top: 15px;
+            padding: 10px;
+            page-break-before: auto;
         }
+
         #result h3 {
-            margin-top: 0;
-            color: #0056b3;
-            margin-bottom: 15px;
+            font-size: 12pt;
+            font-weight: bold;
+            color: #0056b3 !important;
+            margin-bottom: 10px;
         }
+
         #result p {
-            margin: 8px 0;
-            font-size: 16px;
+            font-size: 10pt;
+            margin: 5px 0;
+            color: #000 !important;
         }
+
         #result span {
             font-weight: bold;
-            color: #d63384;
-        }
-        .input-form {
-            display: block; /* Hiện form nhập liệu mặc định */
+            color: #d63384 !important;
         }
 
-        /* --- CSS Stacking Layout cho Bảng trên Mobile (GIỮ NGUYÊN) --- */
-        @media screen and (max-width: 767px) {
-            table thead { display: none; }
-            table, tbody, tr, td { display: block; width: 100% !important; box-sizing: border-box; }
-            table { border: none; }
-            tr { border: 1px solid #ccc; border-radius: 5px; margin-bottom: 20px; padding: 0; background-color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-            td { border: none; border-bottom: 1px dotted #eee; padding: 10px 10px 10px 50%; position: relative; min-height: 40px; display: flex; align-items: center; justify-content: flex-end; text-align: right; }
-            td:last-of-type { border-bottom: none; }
-            td::before { content: attr(data-label); position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: calc(50% - 20px); white-space: normal; text-align: left; font-weight: bold; color: #333; font-size: 13px; }
-            td:first-child { padding: 12px 10px; text-align: left; font-weight: bold; font-size: 1.05em; background-color: #f8f9fa; border-bottom: 1px solid #ccc; display: block; border-top-left-radius: 5px; border-top-right-radius: 5px; }
-            td:first-child::before { display: none; }
-            td input[type="radio"] { margin-left: 5px; transform: scale(1.1); }
-            td:first-child:hover::after { display: none !important; }
-            .selected-row { background-color: transparent !important; font-weight: normal; }
+        #reference-section {
+            display: block !important;
+            border-top: 1px solid #000 !important;
+            margin-top: 20px;
+            padding-top: 10px;
+            page-break-before: auto;
         }
-        /* --- Hết CSS Stacking Layout --- */
 
-        /* --- CSS CHO BẢN IN (ĐÃ CẬP NHẬT THEO YÊU CẦU) --- */
-        @media print {
-            body {
-                background-color: #fff;
-                font-size: 10pt;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                margin: 15mm; /* Thêm lề trang in */
-                padding: 0;
-            }
-            .container {
-                box-shadow: none;
-                padding: 0;
-                margin: 0;
-                max-width: 100%;
-                border: none;
-            }
-
-            /* --- ẨN CÁC PHẦN TỬ KHÔNG MONG MUỐN KHI IN --- */
-            .buttons,                  /* Ẩn nút bấm */
-            .input-form,               /* Ẩn form nhập liệu */
-            .info-section,             /* Ẩn toàn bộ khu vực thông tin trẻ */
-            #table-intro {             /* Ẩn đoạn giới thiệu trước bảng */
-                display: none !important;
-            }
-             td:first-child::after {   /* Ẩn tooltip khi in */
-                 display: none !important;
-             }
-
-             /* --- ĐẢM BẢO CÁC PHẦN TỬ MONG MUỐN HIỂN THỊ VÀ ĐỊNH DẠNG LẠI --- */
-             h1 { /* Tiêu đề */
-                 display: block !important;
-                 font-size: 16pt;
-                 margin-bottom: 15px;
-                 text-align: center;
-                 color: #000 !important;
-             }
-
-             table { /* Bảng biểu */
-                 display: table !important;
-                 width: 100% !important; /* Đảm bảo bảng chiếm đủ rộng */
-                 border-collapse: collapse !important;
-                 margin-bottom: 15px;
-                 page-break-inside: auto; /* Cho phép ngắt trang trong bảng nếu cần */
-             }
-             thead {
-                 display: table-header-group !important; /* Hiển thị header trên mỗi trang nếu bảng dài */
-             }
-             tbody {
-                 display: table-row-group !important;
-             }
-             tr {
-                 display: table-row !important;
-                 page-break-inside: avoid; /* Tránh ngắt trang giữa chừng một hàng */
-                 page-break-after: auto;
-             }
-             th, td {
-                 display: table-cell !important;
-                 border: 1px solid #000 !important;
-                 font-size: 9pt;
-                 padding: 5px;
-                 vertical-align: middle;
-                 text-align: center; /* Reset text-align cho các ô */
-                 background-color: transparent !important; /* Reset background */
-             }
-             th {
-                 font-weight: bold;
-                 background-color: #eee !important; /* Nền xám nhạt cho header */
-             }
-             td:first-child { /* Cột câu hỏi */
-                 text-align: left !important;
-                 width: 40% !important; /* Điều chỉnh lại độ rộng cột khi in */
-             }
-             th:not(:first-child),
-             td:not(:first-child) {
-                 width: 15% !important; /* Điều chỉnh lại độ rộng cột điểm */
-             }
-             .selected-row { /* Bỏ highlight hàng đã chọn khi in */
-                 background-color: #fff !important;
-                 font-weight: normal !important;
-             }
-
-             /* --- Hiển thị dấu tick thay cho radio --- */
-             td:has(> input[type="radio"]) {
-                 position: relative;
-                 height: 20px; /* Đảm bảo ô có chiều cao */
-             }
-             td input[type="radio"] { /* Ẩn radio gốc */
-                 position: absolute;
-                 opacity: 0;
-                 width: 1px; height: 1px;
-                 overflow: hidden; clip: rect(0 0 0 0);
-                 white-space: nowrap; margin: -1px;
-                 padding: 0; border: 0;
-             }
-             td:has(> input[type="radio"]:checked)::after { /* Hiện dấu tick nếu được chọn */
-                 content: '✔';
-                 position: absolute;
-                 top: 50%; left: 50%;
-                 transform: translate(-50%, -50%);
-                 font-size: 14pt; /* Kích thước dấu tick */
-                 font-weight: bold;
-                 color: #000;
-                 display: block;
-                 line-height: 1;
-             }
-
-             #result { /* Phần Kết quả */
-                 display: block !important;
-                 border: 1px solid #000 !important;
-                 background-color: transparent !important;
-                 margin-top: 15px;
-                 padding: 10px;
-                 page-break-before: auto; /* Cho phép ngắt trang trước kết quả nếu cần */
-             }
-             #result h3 {
-                 font-size: 12pt;
-                 font-weight: bold;
-                 color: #000 !important;
-                 margin-bottom: 10px;
-             }
-             #result p {
-                 font-size: 10pt;
-                 margin: 5px 0;
-                 color: #000 !important;
-             }
-             #result span {
-                 font-weight: bold;
-                 color: #000 !important;
-             }
-
-             #reference-section { /* Phần Tham chiếu */
-                 display: block !important;
-                 border-top: 1px solid #000 !important;
-                 margin-top: 20px;
-                 padding-top: 10px;
-                 page-break-before: auto; /* Cho phép ngắt trang trước tham chiếu */
-             }
-             #reference-section h4 {
-                 font-size: 12pt;
-                 font-weight: bold;
-                 color: #000 !important;
-                 margin-bottom: 5px;
-             }
-             #reference-section p {
-                 font-size: 9pt;
-                 font-style: italic;
-                 color: #333 !important;
-                 margin-bottom: 10px;
-             }
-              #reference-section > div { /* Reset flex layout */
-                  display: block !important; /* Stack các box lại */
-              }
-             #reference-section > div > div { /* Định dạng lại các box con */
-                 border: 1px solid #ccc !important;
-                 padding: 8px;
-                 margin-bottom: 10px;
-                 background-color: transparent !important;
-             }
-             #reference-section h5 {
-                 font-size: 10pt;
-                 font-weight: bold;
-                 text-align: left;
-                 color: #000 !important;
-                 margin-top: 0;
-                 margin-bottom: 5px;
-             }
-             #reference-section ul {
-                 padding-left: 20px; /* Thụt lề danh sách */
-                 margin: 5px 0;
-             }
-             #reference-section li {
-                 font-size: 9pt;
-                 color: #000 !important;
-                 margin-bottom: 3px;
-             }
-
-             #qr-code-section { /* Phần QR Code */
-                 display: block !important;
-                 border-top: 1px solid #000 !important;
-                 margin-top: 20px;
-                 padding-top: 10px;
-                 text-align: center;
-                 page-break-before: auto; /* Cho phép ngắt trang trước QR */
-             }
-             #qr-code-section h4 {
-                 font-size: 11pt;
-                 color: #000 !important;
-                 margin-bottom: 5px;
-             }
-             #qr-code-section p {
-                 font-size: 9pt;
-                 color: #555 !important; /* Màu chữ nhạt hơn chút */
-                 margin-bottom: 10px;
-             }
-             #qrcode-output { /* Định dạng QR code */
-                 width: 100px !important; /* Giảm kích thước QR */
-                 height: 100px !important;
-                 margin: 10px auto !important;
-                 padding: 0 !important;
-                 border: none !important;
-             }
-             #qrcode-output img { /* Đảm bảo ảnh QR co giãn đúng */
-                 width: 100% !important;
-                 height: 100% !important;
-                 display: block; /* Tránh khoảng trắng thừa */
-             }
+        #reference-section h4 {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #000 !important;
+            margin-bottom: 5px;
         }
-        /* --- KẾT THÚC CSS CHO BẢN IN --- */
 
-    </style>
+        #reference-section p {
+            font-size: 9pt;
+            font-style: italic;
+            color: #333 !important;
+            margin-bottom: 10px;
+        }
+
+        #reference-section > div {
+            display: block !important;
+        }
+
+        #reference-section > div > div {
+            border: 1px solid #ccc !important;
+            padding: 8px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa !important;
+        }
+
+        #reference-section h5 {
+            font-size: 10pt;
+            font-weight: bold;
+            text-align: center;
+            color: #000 !important;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+        #reference-section > div > div:first-of-type h5 {
+            color: #0056b3 !important;
+        }
+
+        #reference-section > div > div:last-of-type h5 {
+            color: #d63384 !important;
+        }
+
+        #reference-section ul {
+            padding-left: 20px;
+            margin: 5px 0;
+        }
+
+        #reference-section li {
+            font-size: 9pt;
+            color: #000 !important;
+            margin-bottom: 3px;
+        }
+
+        #qr-code-section {
+            display: block !important;
+            border-top: 1px solid #000 !important;
+            margin-top: 20px;
+            padding-top: 10px;
+            text-align: center;
+            page-break-before: auto;
+        }
+
+        #qr-code-section h4 {
+            font-size: 11pt;
+            color: #000 !important;
+            margin-bottom: 5px;
+        }
+
+        #qr-code-section p {
+            font-size: 9pt;
+            color: #555 !important;
+            margin-bottom: 10px;
+        }
+
+        #qrcode-output {
+            width: 100px !important;
+            height: 100px !important;
+            margin: 10px auto !important;
+            padding: 0 !important;
+            border: none !important;
+        }
+
+        #qrcode-output img {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+    }
+</style>
 </head>
 <body>
-
     <div class="container" id="form-container">
         <h1>Thang Đánh Giá ADHD IV – Phiên Bản Tiền Học Đường</h1>
-
         <div class="info-section">
-            <div class="input-form">
-                <div>
-                    <label for="child-name-input">Tên Trẻ:</label>
-                    <input type="text" id="child-name-input" style="width: 250px;">
-                </div>
-                <div>
-                    <label for="age-input">Tuổi:</label>
-                    <input type="number" id="age-input" style="width: 70px;" min="1">
-                </div>
-                <div>
-                    <label>Giới tính:</label>
-                    <input type="radio" name="gender" id="gender-male" value="Nam">
-                    <label for="gender-male" class="gender-label">Nam</label>
-                    <input type="radio" name="gender" id="gender-female" value="Nữ">
-                    <label for="gender-female" class="gender-label">Nữ</label>
-                </div>
-                <div>
-                    <label for="completed-by-input">Người Hoàn Thành:</label>
-                    <input type="text" id="completed-by-input" style="width: 250px;">
-                </div>
-                <div>
-                    <label for="relationship-input">Quan Hệ:</label>
-                    <input type="text" id="relationship-input" style="width: 250px;">
-                </div>
-            </div>
-            <div class="info-display"> <label>Tên Trẻ:</label><span id="child-name"></span><br>
-                <label>Tuổi:</label><span id="age"></span><br>
-                <label>Giới tính:</label><span id="gender"></span><br>
-                <label>Người Hoàn Thành:</label><span id="completed-by"></span><br>
-                <label>Quan Hệ:</label><span id="relationship"></span>
-            </div>
+             <div class="input-form">
+              <div><label for="child-name-input">Tên Trẻ:</label><input type="text" id="child-name-input"></div>
+              <div><label for="age-input">Tuổi:</label><input type="number" id="age-input" min="1"></div>
+              <div><label>Giới tính:</label><input type="radio" name="gender" id="gender-male" value="Nam"><label for="gender-male" class="gender-label">Nam</label><input type="radio" name="gender" id="gender-female" value="Nữ"><label for="gender-female" class="gender-label">Nữ</label></div>
+               <div><label for="completed-by-input">Người Hoàn Thành:</label><input type="text" id="completed-by-input"></div>
+               <div><label for="relationship-input">Quan Hệ:</label><input type="text" id="relationship-input"></div>
+           </div>
+             <div class="info-display">
+                 <label>Tên Trẻ:</label><span id="child-name"></span><br>
+                 <label>Tuổi:</label><span id="age"></span><br>
+                 <label>Giới tính:</label><span id="gender"></span><br>
+                 <label>Người Hoàn Thành:</label><span id="completed-by"></span><br>
+                 <label>Quan Hệ:</label><span id="relationship"></span>
+             </div>
         </div>
-
         <p id="table-intro" style="margin-bottom: 15px; text-align: center; font-style: italic;">Khoanh tròn số mô tả đúng nhất hành vi của trẻ trong 6 tháng qua.</p>
-
         <table>
             <thead>
                 <tr>
@@ -487,20 +605,18 @@
                 <tr><td colspan="5" style="text-align: center;">Đang tải câu hỏi...</td></tr>
             </tbody>
         </table>
-
         <div id="result">
             <h3>Kết quả đánh giá:</h3>
-            <p>Tổng điểm Giảm chú ý (Câu 1, 3, 5, 7, 9, 11, 13, 15, 17): <span id="odd-score">0</span></p>
-            <p>Tổng điểm Tăng động/Xung động (Câu 2, 4, 6, 8, 10, 12, 14, 16, 18): <span id="even-score">0</span></p>
-            <p>Tổng điểm 18 đề mục: <span id="total-score">0</span></p>
+             <p>Tổng điểm Giảm chú ý (Câu 1, 3, 5, 7, 9, 11, 13, 15, 17): <span id="odd-score">0</span></p>
+             <p>Tổng điểm Tăng động/Xung động (Câu 2, 4, 6, 8, 10, 12, 14, 16, 18): <span id="even-score">0</span></p>
+             <p>Tổng điểm 18 đề mục: <span id="total-score">0</span></p>
         </div>
-
         <div id="reference-section" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #ccc;">
             <h4>Thông tin Tham chiếu - Ngưỡng Nghi ngờ ADHD (Phân vị thứ 93)</h4>
-            <p style="font-style: italic; color: #555; margin-bottom: 15px;">
-                <strong>Lưu ý quan trọng:</strong> Điểm số bằng hoặc vượt ngưỡng phân vị thứ 93 gợi ý cần đánh giá thêm, nhưng <strong>không phải là chẩn đoán xác định</strong> ADHD ở trẻ mẫu giáo...
-            </p>
-            <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-around;">
+             <p style="font-style: italic; color: #555; margin-bottom: 15px;">
+                 <strong>Lưu ý quan trọng:</strong> Điểm số bằng hoặc vượt ngưỡng phân vị thứ 93 gợi ý cần đánh giá thêm, nhưng <strong>không phải là chẩn đoán xác định</strong> ADHD ở trẻ mẫu giáo...
+             </p>
+             <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-around;">
                  <div style="border: 1px solid #cfe2ff; padding: 15px; border-radius: 5px; background-color: #f8f9fa; min-width: 280px;">
                      <h5 style="margin-top: 0; text-align: center; color: #0056b3;">Ngưỡng điểm cho Bé Trai (≥ Phân vị 93)</h5>
                      <div><strong>Đánh giá bởi Phụ huynh:</strong><ul><li>Giảm chú ý (Điểm lẻ): ≥ <strong>14</strong></li><li>Tăng động/Xung động (Điểm chẵn): ≥ <strong>17</strong></li><li>Tổng điểm: ≥ <strong>32</strong></li></ul></div>
@@ -508,343 +624,628 @@
                  </div>
                  <div style="border: 1px solid #cfe2ff; padding: 15px; border-radius: 5px; background-color: #f8f9fa; min-width: 280px;">
                      <h5 style="margin-top: 0; text-align: center; color: #d63384;">Ngưỡng điểm cho Bé Gái (≥ Phân vị 93)</h5>
-                      <div><strong>Đánh giá bởi Phụ huynh:</strong><ul><li>Giảm chú ý (Điểm lẻ): ≥ <strong>12</strong></li><li>Tăng động/Xung động (Điểm chẵn): ≥ <strong>14</strong></li><li>Tổng điểm: ≥ <strong>24</strong></li></ul></div>
+                     <div><strong>Đánh giá bởi Phụ huynh:</strong><ul><li>Giảm chú ý (Điểm lẻ): ≥ <strong>12</strong></li><li>Tăng động/Xung động (Điểm chẵn): ≥ <strong>14</strong></li><li>Tổng điểm: ≥ <strong>24</strong></li></ul></div>
                      <div style="margin-top: 10px;"><strong>Đánh giá bởi Giáo viên:</strong><ul><li>Giảm chú ý (Điểm lẻ): ≥ <strong>11</strong></li><li>Tăng động/Xung động (Điểm chẵn): ≥ <strong>13</strong></li><li>Tổng điểm: ≥ <strong>24</strong></li></ul></div>
                  </div>
-            </div>
+             </div>
         </div>
-
-         <div id="qr-code-section" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
+        <div id="qr-code-section" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
             <h4>Mã QR để truy cập trang này</h4>
-            <p style="font-size: 0.9em; color: #666;">Quét mã này bằng điện thoại để mở trang trên thiết bị di động hoặc chia sẻ.</p>
-            <div id="qrcode-output" style="width: 160px; height: 160px; margin: 15px auto; padding: 5px; border: 0px solid #ccc;">
-                </div>
+             <p style="font-size: 0.9em; color: #666;">Quét mã này bằng điện thoại để mở trang trên thiết bị di động hoặc chia sẻ.</p>
+             <div id="qrcode-output" style="width: 160px; height: 160px; margin: 15px auto; padding: 5px; border: 0px solid #ccc;">
+             </div>
         </div>
-
-
         <div class="buttons">
-            <button id="print-score-button" onclick="printResult()">In Kết Quả</button>
             <button id="save-image-button" onclick="saveAsImage()">Lưu Ảnh Kết Quả</button>
+            <button id="print-button" onclick="printSections()">In Kết Quả</button>
         </div>
     </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-
     <script>
-        // --- TOÀN BỘ PHẦN JAVASCRIPT HIỆN CÓ GIỮ NGUYÊN ---
-        const childNameInput = document.getElementById('child-name-input');
-        const ageInput = document.getElementById('age-input');
-        const genderRadios = document.querySelectorAll('input[name="gender"]');
-        const completedByInput = document.getElementById('completed-by-input');
-        const relationshipInput = document.getElementById('relationship-input');
-
-        const childNameDisplay = document.getElementById('child-name');
-        const ageDisplay = document.getElementById('age');
-        const genderDisplay = document.getElementById('gender');
-        const completedByDisplay = document.getElementById('completed-by');
-        const relationshipDisplay = document.getElementById('relationship');
-
-        const resultDiv = document.getElementById('result');
-        const oddScoreSpan = document.getElementById('odd-score');
-        const evenScoreSpan = document.getElementById('even-score');
-        const totalScoreSpan = document.getElementById('total-score');
-        const formContainer = document.getElementById('form-container');
-        let tableBody; // Sẽ được gán giá trị trong DOMContentLoaded
-
-        // Event listeners cho phần thông tin trẻ (giữ nguyên)
-        childNameInput.addEventListener('input', () => { childNameDisplay.textContent = childNameInput.value || ''; });
-        ageInput.addEventListener('input', () => { ageDisplay.textContent = ageInput.value || ''; });
-        genderRadios.forEach(radio => {
-            radio.addEventListener('change', () => {
-                if (radio.checked) { genderDisplay.textContent = radio.value; }
-            });
-        });
-        completedByInput.addEventListener('input', () => { completedByDisplay.textContent = completedByInput.value || ''; });
-        relationshipInput.addEventListener('input', () => { relationshipDisplay.textContent = relationshipInput.value || ''; });
-
-        // Hàm highlight (giữ nguyên)
-        function highlightSelectedRow(selectedRadio) {
-             if (!tableBody) return;
-            tableBody.querySelectorAll('tr').forEach(row => {
-                row.classList.remove('selected-row');
-            });
-            const parentRow = selectedRadio.closest('tr');
-            if (parentRow) {
-                parentRow.classList.add('selected-row');
-            }
+    // --- JavaScript Globals ---
+    const childNameInput = document.getElementById('child-name-input');
+    const ageInput = document.getElementById('age-input');
+    const genderRadios = document.querySelectorAll('input[name="gender"]');
+    const completedByInput = document.getElementById('completed-by-input');
+    const relationshipInput = document.getElementById('relationship-input');
+    const childNameDisplay = document.getElementById('child-name');
+    const ageDisplay = document.getElementById('age');
+    const genderDisplay = document.getElementById('gender');
+    const completedByDisplay = document.getElementById('completed-by');
+    const relationshipDisplay = document.getElementById('relationship');
+    const infoSectionDiv = document.querySelector('.info-section');
+    const inputFormDiv = document.querySelector('.input-form');
+    const infoDisplayDiv = document.querySelector('.info-display');
+    const resultDiv = document.getElementById('result');
+    const oddScoreSpan = document.getElementById('odd-score');
+    const evenScoreSpan = document.getElementById('even-score');
+    const totalScoreSpan = document.getElementById('total-score');
+    const formContainer = document.getElementById('form-container');
+    let tableBody;
+    // --- Event Listeners for Info ---
+    childNameInput.addEventListener('input', () => { childNameDisplay.textContent = childNameInput.value || ''; });
+    ageInput.addEventListener('input', () => { ageDisplay.textContent = ageInput.value || ''; });
+    genderRadios.forEach(radio => { radio.addEventListener('change', () => { if (radio.checked) { genderDisplay.textContent = radio.value; } }); });
+    completedByInput.addEventListener('input', () => { completedByDisplay.textContent = completedByInput.value || ''; });
+    relationshipInput.addEventListener('input', () => { relationshipDisplay.textContent = relationshipInput.value || ''; });
+    // --- Core Functions ---
+    function highlightSelectedRow(selectedRadio) {
+        if (!tableBody) return;
+        const mobileMaxWidth = 767;
+        const isMobileView = window.innerWidth <= mobileMaxWidth;
+        if (isMobileView) {
+            tableBody.querySelectorAll('tr').forEach(row => { row.classList.remove('selected-row'); });
+            return;
         }
-
-        // Hàm tính điểm (giữ nguyên)
-        function calculateScore() {
-            let oddScore = 0, evenScore = 0, totalScore = 0, answeredCount = 0;
-            const questionCount = tableBody ? tableBody.querySelectorAll('tr').length : 0;
-
-            for (let i = 1; i <= questionCount; i++) {
-                let selected = document.querySelector(`input[name="q${i}"]:checked`);
-                if (selected) {
-                    let value = parseInt(selected.value);
-                    if (i % 2 === 1) { oddScore += value; }
-                    else { evenScore += value; }
+        tableBody.querySelectorAll('tr').forEach(row => { row.classList.remove('selected-row'); });
+        const parentRow = selectedRadio.closest('tr');
+        if (parentRow) {
+            parentRow.classList.add('selected-row');
+        }
+    }
+    function calculateScore() {
+        let oddScore = 0, evenScore = 0, totalScore = 0, answeredCount = 0;
+        const questionCount = tableBody ? tableBody.querySelectorAll('tr').length : 0;
+        if (questionCount === 0) {
+            resultDiv.style.display = 'none';
+            return;
+        }
+        for (let i = 1; i <= questionCount; i++) {
+            let selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if (selected) {
+                let value = parseInt(selected.value);
+                if (!isNaN(value)) {
+                    if (i % 2 === 1) { oddScore += value; } else { evenScore += value; }
                     totalScore += value;
-                    answeredCount++;
                 }
+                answeredCount++;
             }
-            oddScoreSpan.textContent = oddScore;
-            evenScoreSpan.textContent = evenScore;
-            totalScoreSpan.textContent = totalScore;
-            resultDiv.style.display = answeredCount > 0 ? 'block' : 'none'; // Hiển thị kết quả nếu có câu trả lời
         }
-
-        // Hàm kiểm tra hoàn thành (cập nhật để đếm số câu thực tế)
-        function checkCompletion() {
-            const questionCount = tableBody ? tableBody.querySelectorAll('tr').length : 0;
-             if (questionCount === 0) return false; // Chưa tải xong
-            for (let i = 1; i <= questionCount; i++) {
-                if (!document.querySelector(`input[name="q${i}"]:checked`)) {
-                    return false;
-                }
+        oddScoreSpan.textContent = oddScore;
+        evenScoreSpan.textContent = evenScore;
+        totalScoreSpan.textContent = totalScore;
+        resultDiv.style.display = answeredCount > 0 ? 'block' : 'none';
+    }
+    function checkCompletion() {
+        const questionCount = tableBody ? tableBody.querySelectorAll('tr').length : 0;
+        if (questionCount === 0) return false;
+        for (let i = 1; i <= questionCount; i++) {
+            if (!document.querySelector(`input[name="q${i}"]:checked`)) {
+                return false;
             }
-            return true;
         }
-
-        // Hàm in (KHÔNG CẦN THAY ĐỔI - CSS @media print sẽ xử lý việc hiển thị)
-        function printResult() {
-            if (!checkCompletion()) {
-                alert('Vui lòng hoàn thành tất cả câu hỏi trước khi in kết quả!');
-                return;
-            }
-            // Cập nhật thông tin lần cuối (chủ yếu cho saveAsImage, không ảnh hưởng nhiều đến print)
-            childNameDisplay.textContent = childNameInput.value || 'Chưa nhập';
-            ageDisplay.textContent = ageInput.value || 'Chưa nhập';
-            const checkedGender = document.querySelector('input[name="gender"]:checked');
-            genderDisplay.textContent = checkedGender ? checkedGender.value : 'Chưa chọn';
-            completedByDisplay.textContent = completedByInput.value || 'Chưa nhập';
-            relationshipDisplay.textContent = relationshipInput.value || 'Chưa nhập';
-
-            // Gọi hàm in của trình duyệt, CSS @media print sẽ áp dụng
-            window.print();
+        return true;
+    }
+    function updateDisplayInfo() {
+        childNameDisplay.textContent = childNameInput.value || 'Chưa nhập';
+        ageDisplay.textContent = ageInput.value || 'Chưa nhập';
+        const checkedGender = document.querySelector('input[name="gender"]:checked');
+        genderDisplay.textContent = checkedGender ? checkedGender.value : 'Chưa chọn';
+        completedByDisplay.textContent = completedByInput.value || 'Chưa nhập';
+        relationshipDisplay.textContent = relationshipInput.value || 'Chưa nhập';
+    }
+    function saveAsImage() {
+        if (!checkCompletion()) {
+            alert('Vui lòng hoàn thành tất cả câu hỏi trước khi lưu ảnh kết quả!');
+            return;
         }
-
-        // Hàm lưu ảnh (giữ nguyên)
-        function saveAsImage() {
-            if (!checkCompletion()) {
-                alert('Vui lòng hoàn thành tất cả câu hỏi trước khi lưu ảnh kết quả!');
-                return;
-            }
-            // Cập nhật thông tin lần cuối
-            childNameDisplay.textContent = childNameInput.value || 'Chưa nhập';
-            ageDisplay.textContent = ageInput.value || 'Chưa nhập';
-            const checkedGender = document.querySelector('input[name="gender"]:checked');
-            genderDisplay.textContent = checkedGender ? checkedGender.value : 'Chưa chọn';
-            completedByDisplay.textContent = completedByInput.value || 'Chưa nhập';
-            relationshipDisplay.textContent = relationshipInput.value || 'Chưa nhập';
-
-            const buttonsDiv = document.querySelector('.buttons');
-            const inputFormDiv = document.querySelector('.input-form');
-            const infoDisplayDiv = document.querySelector('.info-display');
-            const tableIntroP = document.getElementById('table-intro');
-
-            // --- TẠM ẨN/HIỆN CÁC PHẦN TỬ ĐỂ CHỤP ẢNH ĐẸP HƠN ---
-            buttonsDiv.style.display = 'none';        // Ẩn nút
-            inputFormDiv.style.display = 'none';      // Ẩn form nhập
-            infoDisplayDiv.style.display = 'block';   // Hiện thông tin tóm tắt
-            tableIntroP.style.display = 'none';       // Ẩn dòng giới thiệu bảng
-
-            // (Optional) Có thể thêm style tạm thời khác nếu cần cho ảnh
-            // Ví dụ: formContainer.style.boxShadow = 'none';
-
-            html2canvas(formContainer, {
-                 scale: 1.5,
-                 useCORS: true,
-                 // Bỏ qua các phần tử không cần trong ảnh (ví dụ: tooltip nếu nó đang hiện)
-                 ignoreElements: (element) => {
-                      // Có thể thêm logic phức tạp hơn ở đây nếu cần
-                      return false;
-                 }
-             })
-                .then(canvas => {
-                    let link = document.createElement('a');
-                    const childName = childNameInput.value.trim().replace(/\s+/g, '_') || 'Tre';
-                    const date = new Date();
-                    const dateString = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
-                    link.download = `ADHD_DanhGia_${childName}_${dateString}.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-
-                    // --- KHÔI PHỤC HIỂN THỊ SAU KHI CHỤP ---
-                    buttonsDiv.style.display = 'block';
-                    inputFormDiv.style.display = 'block';
-                    infoDisplayDiv.style.display = 'none';
-                    tableIntroP.style.display = 'block';
-                   // formContainer.style.boxShadow = ''; // Khôi phục style nếu đã thay đổi
-                }).catch(err => {
-                    console.error("Lỗi khi tạo ảnh:", err);
-                    alert("Đã có lỗi xảy ra khi tạo ảnh kết quả.");
-                    // --- KHÔI PHỤC HIỂN THỊ NẾU CÓ LỖI ---
-                    buttonsDiv.style.display = 'block';
-                    inputFormDiv.style.display = 'block';
-                    infoDisplayDiv.style.display = 'none';
-                    tableIntroP.style.display = 'block';
-                    // formContainer.style.boxShadow = '';
-                });
-        }
-        // --- KẾT THÚC PHẦN HÀM HIỆN CÓ ---
-
-
-        // --- PHẦN MÃ MỚI/CẬP NHẬT ĐỂ TẢI DỮ LIỆU TỪ APPS SCRIPT (GIỮ NGUYÊN) ---
-        document.addEventListener('DOMContentLoaded', () => {
-            tableBody = document.getElementById('questions-body'); // Gán giá trị tableBody
-
-            // !!! THAY THẾ URL NÀY BẰNG URL WEB APP CỦA BẠN !!!
-            const webAppUrl = 'https://script.google.com/macros/s/AKfycbxmYJwZcZVLdUchDSs35C5AJI6E2Yii0OKKji4MA3472okd2Kn544mU0-TVs5hXwrE/exec';
-            // Ví dụ: const webAppUrl = 'https://script.google.com/macros/s/AKfycby.../exec';
-
-            fetch(webAppUrl)
-                .then(response => {
-                    if (!response.ok) {
-                         return response.text().then(text => {
-                            throw new Error(`HTTP error! status: ${response.status}, message: ${text || 'Không có thông báo lỗi'}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(questionsData => {
-                     if (!Array.isArray(questionsData)) {
-                        console.error('Dữ liệu nhận được:', questionsData);
-                        throw new Error('Dữ liệu nhận được không phải là một mảng hợp lệ.');
-                    }
-                    if (questionsData.length > 0) {
-                        populateTable(questionsData);
-                        initializeEventListeners();
-                        calculateScore(); // Tính điểm ban đầu (sẽ là 0)
-                    } else {
-                        throw new Error('Không nhận được dữ liệu câu hỏi (mảng rỗng).');
-                    }
-                })
-                .catch(error => {
-                    console.error('Lỗi khi tải hoặc xử lý dữ liệu câu hỏi từ Apps Script:', error);
-                    if (tableBody) {
-                        tableBody.innerHTML = `<tr><td colspan="5" style="color: red; text-align: center; padding: 20px;">
-                            <strong>Lỗi tải dữ liệu!</strong><br>
-                            Không thể tải danh sách câu hỏi từ Google Apps Script.<br>
-                            Vui lòng kiểm tra lại URL Web App trong mã nguồn và đảm bảo Apps Script được triển khai đúng cách (quyền truy cập "Anyone").<br>
-                            <small>Chi tiết lỗi: ${error.message}</small>
-                        </td></tr>`;
+        updateDisplayInfo();
+        const buttonsDiv = document.querySelector('.buttons');
+        const currentInputFormDiv = document.querySelector('.input-form');
+        const currentInfoDisplayDiv = document.querySelector('.info-display');
+        const tableIntroP = document.getElementById('table-intro');
+        const tooltipElements = document.querySelectorAll('.tooltip-trigger, .tooltip-text');
+        const originalFormContainer = document.getElementById('form-container');
+        const originalTableBody = document.getElementById('questions-body');
+        const originalResultDiv = document.getElementById('result');
+        const originalReferenceSection = document.getElementById('reference-section');
+        const originalQrSection = document.getElementById('qr-code-section');
+        const originalH1 = originalFormContainer.querySelector('h1');
+        const mobileMaxWidth = 767;
+        const isMobileView = window.innerWidth <= mobileMaxWidth;
+        const viewMode = isMobileView ? 'Mobile' : 'Desktop';
+        console.log(`Đang thực hiện lưu ảnh ở chế độ: ${viewMode}`);
+        if (buttonsDiv) buttonsDiv.style.display = 'none';
+        if (currentInputFormDiv) currentInputFormDiv.style.display = 'none';
+        if (tableIntroP) tableIntroP.style.display = 'none';
+        tooltipElements.forEach(el => el.style.visibility = 'hidden');
+        if (currentInfoDisplayDiv) currentInfoDisplayDiv.style.display = 'block';
+        let elementToCapture;
+        let cleanupActions = [];
+        if (isMobileView) {
+            const mobileCaptureDiv = document.createElement('div');
+            mobileCaptureDiv.id = 'temp-mobile-capture';
+            Object.assign(mobileCaptureDiv.style, { width: '95%', maxWidth: '800px', margin: '10px auto', padding: '15px', backgroundColor: '#ffffff', border: '1px solid #ddd', fontFamily: "'Roboto', Arial, sans-serif", fontSize: '14px', color: '#333', position: 'absolute', left: '-9999px', top: '0' });
+            if (originalH1) mobileCaptureDiv.appendChild(originalH1.cloneNode(true));
+            if (currentInfoDisplayDiv) { const clonedInfo = currentInfoDisplayDiv.cloneNode(true); Object.assign(clonedInfo.style, { backgroundColor: '#e9ecef', padding: '15px', borderRadius: '5px', marginBottom: '15px' }); mobileCaptureDiv.appendChild(clonedInfo); }
+            const qaListDiv = document.createElement('div');
+            Object.assign(qaListDiv.style, { marginTop: '20px', marginBottom: '20px', borderTop: '1px solid #eee', paddingTop: '15px' });
+            const answerLabels = { '0': 'Hiếm khi hoặc không bao giờ (0)', '1': 'Thỉnh thoảng (1)', '2': 'Thường xuyên (2)', '3': 'Rất thường xuyên (3)' };
+            if (originalTableBody) {
+                const questions = originalTableBody.querySelectorAll('tr');
+                questions.forEach((row, index) => {
+                    const questionCell = row.cells[0];
+                    const checkedRadio = row.querySelector('input[type="radio"]:checked');
+                    if (questionCell && checkedRadio) {
+                        let questionText = '';
+                        questionCell.childNodes.forEach(node => { if (node.nodeType === Node.TEXT_NODE) { questionText += node.textContent.trim(); } });
+                        questionText = questionText || `Câu ${index + 1}`;
+                        const answerValue = checkedRadio.value;
+                        const answerText = answerLabels[answerValue] || `Giá trị ${answerValue}`;
+                        const p = document.createElement('p');
+                        Object.assign(p.style, { margin: '8px 0', lineHeight: '1.5' });
+                        p.innerHTML = `<strong>${index + 1}. ${questionText}:</strong> ${answerText}`;
+                        qaListDiv.appendChild(p);
                     }
                 });
-
-            // Tạo mã QR code (giữ nguyên logic)
-            generateCurrentPageQRCode();
+            }
+            mobileCaptureDiv.appendChild(qaListDiv);
+            if (originalResultDiv) { const clonedResult = originalResultDiv.cloneNode(true); clonedResult.style.display = 'block'; mobileCaptureDiv.appendChild(clonedResult); }
+            if (originalReferenceSection) mobileCaptureDiv.appendChild(originalReferenceSection.cloneNode(true));
+            if (originalQrSection) mobileCaptureDiv.appendChild(originalQrSection.cloneNode(true));
+            document.body.appendChild(mobileCaptureDiv);
+            elementToCapture = mobileCaptureDiv;
+            cleanupActions.push(() => { if (mobileCaptureDiv.parentNode === document.body) { document.body.removeChild(mobileCaptureDiv); } });
+        } else {
+            elementToCapture = originalFormContainer;
+            const allRadioButtons = originalTableBody ? originalTableBody.querySelectorAll('input[type="radio"]') : [];
+            const addedCheckmarks = [];
+            const hiddenRadiosInfo = [];
+            document.body.classList.add('force-print-view');
+            cleanupActions.push(() => document.body.classList.remove('force-print-view'));
+            allRadioButtons.forEach(radio => {
+                const parentTd = radio.closest('td');
+                if (!parentTd) return;
+                hiddenRadiosInfo.push({ element: radio });
+                radio.classList.add('hide-radio-for-capture');
+                if (radio.checked) {
+                    const checkmark = document.createElement('span');
+                    checkmark.className = 'temp-checkmark-for-capture';
+                    checkmark.textContent = 'x';
+                    parentTd.appendChild(checkmark);
+                    addedCheckmarks.push(checkmark);
+                }
+            });
+            cleanupActions.push(() => {
+                addedCheckmarks.forEach(checkmark => checkmark.remove());
+                hiddenRadiosInfo.forEach(info => info.element.classList.remove('hide-radio-for-capture'));
+            });
+        }
+        console.log(`Bắt đầu html2canvas cho chế độ ${viewMode}...`);
+        html2canvas(elementToCapture, {
+            scale: isMobileView ? 2 : 2.5, useCORS: true, logging: false, backgroundColor: '#ffffff', scrollX: 0, scrollY: 0,
+            windowWidth: elementToCapture.scrollWidth,
+            windowHeight: elementToCapture.scrollHeight
+        })
+        .then(canvas => {
+            console.log('html2canvas thành công, đang tạo link tải xuống...');
+            let link = document.createElement('a');
+            const childName = childNameInput.value.trim().replace(/\s+/g, '_') || 'Tre';
+            const date = new Date();
+            const dateString = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
+            const fileNameSuffix = isMobileView ? '_MobileView' : '_PrintView';
+            link.download = `ADHD_DanhGia_${childName}_${dateString}${fileNameSuffix}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            console.log('Đã kích hoạt tải ảnh.');
+        }).catch(err => {
+            console.error(`Lỗi khi tạo ảnh (${viewMode}) bằng html2canvas:`, err);
+            alert("Đã có lỗi xảy ra khi tạo ảnh kết quả. Vui lòng thử lại hoặc kiểm tra console log (Nhấn F12).");
+        }).finally(() => {
+            console.log(`Khôi phục giao diện sau khi lưu ảnh (${viewMode})...`);
+            cleanupActions.forEach(action => action());
+            if (buttonsDiv) buttonsDiv.style.display = 'block';
+            if (currentInputFormDiv) currentInputFormDiv.style.display = 'block';
+            if (tableIntroP) tableIntroP.style.display = 'block';
+            tooltipElements.forEach(el => el.style.visibility = 'visible');
+            if (currentInfoDisplayDiv) currentInfoDisplayDiv.style.display = 'none';
+            console.log('Khôi phục giao diện hoàn tất.');
         });
-
-        // Hàm tạo bảng từ dữ liệu (CẬP NHẬT để thêm data-label - Giữ nguyên)
-        function populateTable(questions) {
-           if (!tableBody) return;
-           tableBody.innerHTML = ''; // Xóa "Đang tải..."
-
-           const headers = Array.from(document.querySelectorAll('table thead th')).map(th => th.textContent.trim());
-
-           questions.forEach((q, index) => {
-               const row = document.createElement('tr');
-               const questionNumber = index + 1;
-
-               const questionCell = document.createElement('td');
-               questionCell.textContent = q.question || `Câu hỏi ${questionNumber}`;
-               questionCell.setAttribute('data-tooltip', q.tooltip || 'Không có giải thích.');
-               row.appendChild(questionCell);
-
-               for (let i = 0; i <= 3; i++) {
-                   const radioCell = document.createElement('td');
-                   const radioInput = document.createElement('input');
-                   radioInput.type = 'radio';
-                   radioInput.name = `q${questionNumber}`;
-                   radioInput.value = i;
-                   radioCell.appendChild(radioInput);
-                   if (headers[i + 1]) {
-                       radioCell.setAttribute('data-label', headers[i + 1]);
-                   } else {
-                       radioCell.setAttribute('data-label', `Mức ${i}`);
-                   }
-                   row.appendChild(radioCell);
-               }
-               tableBody.appendChild(row);
-           });
-           console.log(`Đã tạo bảng với ${questions.length} câu hỏi và data-labels.`);
-         }
-
-        // Hàm gắn lại các sự kiện (giữ nguyên logic)
-        function initializeEventListeners() {
-             if (!tableBody) {
-                 console.error("Không tìm thấy tableBody để gắn listeners.");
-                 return;
-             }
-             // Listener cho click bảng (TD hoặc INPUT)
-             tableBody.addEventListener('click', function(e) {
-                 const target = e.target;
-                 if (target.tagName === 'TD' || (target.tagName === 'INPUT' && target.type === 'radio')) {
-                     let radioToCheck;
-                     let parentRow;
-
-                     if (target.tagName === 'TD') {
-                         radioToCheck = target.querySelector('input[type="radio"]');
-                         parentRow = target.parentElement;
-                         if (target === parentRow.cells[0]) return; // Bỏ qua click vào ô câu hỏi
-                     } else { // target là INPUT
-                         radioToCheck = target;
-                         parentRow = target.closest('tr');
-                     }
-
-                     if (radioToCheck && !radioToCheck.checked) {
-                         radioToCheck.checked = true;
-                         radioToCheck.dispatchEvent(new Event('change', { bubbles: true }));
-                     } else if (radioToCheck && radioToCheck.checked && target.tagName === 'TD') {
-                          radioToCheck.dispatchEvent(new Event('change', { bubbles: true }));
-                     }
-                 }
-             });
-
-             // Listener cho sự kiện change trên các radio
-             tableBody.querySelectorAll('input[type="radio"]').forEach(radio => {
-                 radio.addEventListener('change', handleRadioChange);
-             });
-             console.log("Đã khởi tạo event listeners cho bảng.");
-         }
-
-         // Hàm xử lý chung cho sự kiện change của radio (giữ nguyên)
-         function handleRadioChange(event) {
-             if (event.target.checked) { // Chỉ xử lý khi radio được check
-                 calculateScore();
-                 highlightSelectedRow(event.target);
-             }
-         }
-        // --- KẾT THÚC PHẦN MÃ TẢI DỮ LIỆU ---
-
-        // --- Mã QR Code (Giữ nguyên) ---
-        function generateCurrentPageQRCode() {
-            var qrCodeOutputElement = document.getElementById("qrcode-output");
-            if (!qrCodeOutputElement) {
-                console.error('Placeholder element "qrcode-output" not found.');
-                return;
-            }
-            qrCodeOutputElement.innerHTML = ""; // Xóa mã cũ
-            var currentURL = window.location.href;
-            try {
-                var qrcode = new QRCode(qrCodeOutputElement, {
-                    text: currentURL,
-                    width: 150, // Giữ kích thước hiển thị trên web
-                    height: 150,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-                console.log('QR Code generated for URL:', currentURL);
-            } catch (error) {
-                console.error('Error generating QR Code:', error);
-                qrCodeOutputElement.innerHTML = "Lỗi khi tạo mã QR.";
-            }
+    }
+    // --- Print Function ---
+    function printSections() {
+        if (!checkCompletion()) {
+            alert('Vui lòng hoàn thành tất cả câu hỏi trước khi in kết quả!');
+            return;
         }
-    </script>
+        updateDisplayInfo(); // Cập nhật thông tin hiển thị trước khi in
+
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            alert('Trình duyệt của bạn có thể đã chặn cửa sổ pop-up. Vui lòng cho phép pop-up và thử lại.');
+            return;
+        }
+
+        const h1Clone = document.querySelector('h1').cloneNode(true);
+        const infoSection = document.querySelector('.info-section').cloneNode(true);
+        infoSection.classList.add('info-box'); // Thêm class info-box để định dạng
+        const table = document.querySelector('table').cloneNode(true);
+        const result = document.getElementById('result').cloneNode(true);
+        const referenceSection = document.getElementById('reference-section').cloneNode(true);
+        const qrCodeSection = document.getElementById('qr-code-section').cloneNode(true);
+
+        // Ẩn input-form và hiển thị info-display trong bản in
+        const inputForm = infoSection.querySelector('.input-form');
+        if (inputForm) inputForm.style.display = 'none';
+        const infoDisplay = infoSection.querySelector('.info-display');
+        if (infoDisplay) infoDisplay.style.display = 'block';
+
+        // Lấy dữ liệu radio đã chọn từ DOM gốc và "vẽ" vào bảng sao chép
+        const originalTableBody = document.getElementById('questions-body');
+        const clonedTableBody = table.querySelector('tbody');
+
+        if (originalTableBody && clonedTableBody) {
+            const originalRows = originalTableBody.querySelectorAll('tr');
+            const clonedRows = clonedTableBody.querySelectorAll('tr');
+
+            originalRows.forEach((originalRow, rowIndex) => {
+                const originalCells = originalRow.querySelectorAll('td');
+                const clonedCells = clonedRows[rowIndex].querySelectorAll('td');
+
+                originalCells.forEach((originalCell, cellIndex) => {
+                    const clonedCell = clonedCells[cellIndex];
+
+                    // Loại bỏ tooltip trigger và text nếu có trong cell đã clone
+                    const tooltipTrigger = clonedCell.querySelector('.tooltip-trigger');
+                    const tooltipText = clonedCell.querySelector('.tooltip-text');
+                    if (tooltipTrigger) tooltipTrigger.remove();
+                    if (tooltipText) tooltipText.remove();
+
+                    // Xử lý các ô radio
+                    const originalRadio = originalCell.querySelector('input[type="radio"]');
+                    if (originalRadio) {
+                        if (originalRadio.checked) {
+                            clonedCell.innerHTML = 'x'; // Thay bằng 'x'
+                        } else {
+                            clonedCell.innerHTML = ''; // Xóa nội dung nếu không chọn
+                        }
+                    } else if (cellIndex === 0) { // Ô câu hỏi đầu tiên
+                        // Giữ lại nội dung text của câu hỏi (loại bỏ tooltip trigger và text đã xóa ở trên)
+                        let questionText = '';
+                        originalCell.childNodes.forEach(node => {
+                            if (node.nodeType === Node.TEXT_NODE) {
+                                questionText += node.textContent.trim();
+                            }
+                        });
+                        clonedCell.innerHTML = questionText;
+                        clonedCell.style.textAlign = 'left'; // Căn trái cho câu hỏi
+                        clonedCell.style.verticalAlign = 'middle'; // Căn giữa theo chiều dọc
+                    }
+                     // Căn giữa cho các ô điểm (chỉ áp dụng nếu không phải ô câu hỏi)
+                    if (cellIndex > 0) {
+                        clonedCell.style.textAlign = 'center';
+                        clonedCell.style.verticalAlign = 'middle';
+                    }
+                });
+            });
+             // Định dạng tiêu đề bảng (th)
+            const headers = table.querySelectorAll('th');
+            headers.forEach(th => {
+                th.style.fontWeight = 'bold';
+                th.style.textAlign = 'center'; // Căn giữa tiêu đề cột điểm
+                if (th.cellIndex === 0) {
+                    th.style.textAlign = 'left'; // Căn trái cho tiêu đề "Hành vi"
+                }
+            });
+        }
+
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Kết quả đánh giá ADHD</title>
+                <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                <style>
+                    body { font-family: 'Roboto', Arial, sans-serif; font-size: 10pt; margin: 15mm; }
+                    h1 { text-align: center; font-size: 16pt; margin-bottom: 20px; color: #000; }
+
+                    .info-section.info-box {
+                        border: 1px solid #ccc;
+                        padding: 10px;
+                        margin-bottom: 20px;
+                        border-radius: 5px;
+                        background-color: #f8f9fa; /* Nền nhẹ cho box */
+                    }
+                    .info-section.info-box .info-display label {
+                        display: inline-block;
+                        width: 150px;
+                        font-weight: bold;
+                        margin-right: 5px;
+                        color: #333;
+                    }
+                    .info-section.info-box .info-display span {
+                        display: inline-block;
+                        color: #000;
+                    }
+
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 20px;
+                        font-size: 9pt;
+                        table-layout: fixed; /* Giữ fixed để duy trì độ rộng cột đã set */
+                    }
+                    th, td {
+                        border: 1px solid #000;
+                        padding: 5px;
+                        vertical-align: middle;
+                    }
+                    th {
+                        background-color: #eee;
+                        font-weight: bold;
+                        color: #000;
+                        text-align: center;
+                    }
+                    th:first-child {
+                        text-align: left;
+                    }
+                    td:first-child {
+                        text-align: left; /* Căn trái cho cột câu hỏi */
+                        width: 45%;
+                    }
+                    td:not(:first-child) {
+                        text-align: center; /* Căn giữa cho các cột điểm */
+                        width: 13.75%;
+                    }
+                    /* Quy tắc để 'x' hiển thị trong ô được chọn */
+                    td:empty {
+                        /* Đảm bảo ô trống nếu không có 'x' */
+                    }
+
+                    #result {
+                        margin-top: 20px;
+                        padding: 10px;
+                        border: 1px solid #000;
+                        background-color: #e7f1ff;
+                        color: #000;
+                    }
+                    #result h3 { color: #0056b3; margin-bottom: 10px; }
+                    #result p { margin: 5px 0; }
+                    #result span { font-weight: bold; color: #d63384; }
+
+                    #reference-section {
+                        margin-top: 20px;
+                        padding-top: 10px;
+                        border-top: 1px solid #000;
+                    }
+                    #reference-section h4 { color: #000; margin-bottom: 5px; }
+                    #reference-section p { font-size: 9pt; font-style: italic; color: #333; margin-bottom: 10px; }
+                    #reference-section > div { display: block; } /* Để các cột reference xếp chồng */
+                    #reference-section > div > div {
+                        border: 1px solid #ccc;
+                        padding: 8px;
+                        margin-bottom: 10px;
+                        background-color: #f8f9fa;
+                        /* Đảm bảo chiếm đủ chiều rộng */
+                        width: 100%;
+                        box-sizing: border-box;
+                    }
+                    #reference-section h5 { text-align: center; color: #000; margin-bottom: 5px; }
+                    #reference-section ul { padding-left: 20px; margin: 5px 0; }
+                    #reference-section li { font-size: 9pt; color: #000; margin-bottom: 3px; }
+
+                    #qr-code-section {
+                        margin-top: 20px;
+                        padding-top: 10px;
+                        border-top: 1px solid #000;
+                        text-align: center;
+                    }
+                    #qr-code-section h4 { color: #000; margin-bottom: 5px; }
+                    #qr-code-section p { font-size: 9pt; color: #555; margin-bottom: 10px; }
+                    #qrcode-output { width: 100px; height: 100px; margin: 10px auto; padding: 0; border: none; }
+                    #qrcode-output img { width: 100%; height: 100%; display: block; }
+                </style>
+            </head>
+            <body>
+                ${h1Clone.outerHTML}
+                ${infoSection.outerHTML}
+                ${table.outerHTML}
+                ${result.outerHTML}
+                ${referenceSection.outerHTML}
+                ${qrCodeSection.outerHTML}
+            </body>
+            </html>
+        `);
+
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+    }
+    // --- Initialization and Data Loading ---
+    document.addEventListener('DOMContentLoaded', () => {
+        tableBody = document.getElementById('questions-body');
+        if (!tableBody) {
+            console.error("CRITICAL: Không tìm thấy tbody#questions-body!");
+            return;
+        }
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbxmYJwZcZVLdUchDSs35C5AJI6E2Yii0OKKji4MA3472okd2Kn544mU0-TVs5hXwrE/exec';
+        fetch(webAppUrl)
+            .then(response => { if (!response.ok) { return response.text().then(text => { throw new Error(`HTTP error! status: ${response.status}, message: ${text || 'Không có thông báo lỗi'}`); }); } return response.json(); })
+            .then(questionsData => {
+                if (!Array.isArray(questionsData)) { console.error('Dữ liệu nhận được:', questionsData); throw new Error('Dữ liệu nhận được không phải là một mảng hợp lệ.'); }
+                if (questionsData.length > 0) {
+                    populateTable(questionsData);
+                    calculateScore();
+                } else {
+                    throw new Error('Không nhận được dữ liệu câu hỏi (mảng rỗng).');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi tải hoặc xử lý dữ liệu câu hỏi từ Apps Script:', error);
+                tableBody.innerHTML = `<tr><td colspan="5" style="color: red; text-align: center; padding: 20px;"><strong>Lỗi tải dữ liệu!</strong><br>Không thể tải danh sách câu hỏi.<br><small>Chi tiết: ${error.message}</small></td></tr>`;
+            });
+        generateCurrentPageQRCode();
+    });
+    function populateTable(questions) {
+        if (!tableBody) return;
+        tableBody.innerHTML = '';
+        const headers = Array.from(document.querySelectorAll('table thead th')).map(th => th.textContent.trim());
+        questions.forEach((q, index) => {
+            const row = document.createElement('tr');
+            const questionNumber = index + 1;
+            const tooltipId = `tooltip-q${questionNumber}`;
+            const questionCell = document.createElement('td');
+            const questionTextNode = document.createTextNode((q.question || `Câu hỏi ${questionNumber}`) + ' ');
+            questionCell.appendChild(questionTextNode);
+            const triggerSpan = document.createElement('span');
+            triggerSpan.className = 'tooltip-trigger';
+            triggerSpan.textContent = 'ℹ';
+            triggerSpan.setAttribute('tabindex', '0');
+            triggerSpan.setAttribute('role', 'button');
+            triggerSpan.setAttribute('aria-describedby', tooltipId);
+            triggerSpan.setAttribute('aria-expanded', 'false');
+            triggerSpan.setAttribute('aria-label', `Xem giải thích cho câu ${questionNumber}`);
+            questionCell.appendChild(triggerSpan);
+            const tooltipSpan = document.createElement('span');
+            tooltipSpan.className = 'tooltip-text';
+            tooltipSpan.id = tooltipId;
+            tooltipSpan.textContent = q.tooltip || 'Không có giải thích chi tiết.';
+            questionCell.appendChild(tooltipSpan);
+            row.appendChild(questionCell);
+            for (let i = 0; i <= 3; i++) {
+                const radioCell = document.createElement('td');
+                const radioInput = document.createElement('input');
+                radioInput.type = 'radio';
+                radioInput.name = `q${questionNumber}`;
+                radioInput.value = i;
+                const labelText = headers[i + 1] || `Mức ${i}`;
+                radioInput.setAttribute('aria-label', `${labelText} cho câu ${questionNumber}`);
+                radioCell.appendChild(radioInput);
+                radioCell.setAttribute('data-label', labelText);
+                row.appendChild(radioCell);
+            }
+            tableBody.appendChild(row);
+        });
+        console.log(`Đã tạo bảng với ${questions.length} câu hỏi và cấu trúc tooltip mới (hover/focus desktop, tap mobile).`);
+        initializeEventListeners();
+    }
+    function initializeEventListeners() {
+        if (!tableBody) {
+            console.error("Không tìm thấy tableBody để gắn listeners.");
+            return;
+        }
+        tableBody.addEventListener('change', function(event) {
+            if (event.target.type === 'radio' && event.target.checked) {
+                handleRadioChange(event.target);
+            }
+        });
+        tableBody.addEventListener('click', function(event) {
+            const target = event.target;
+            if (target.classList.contains('tooltip-trigger')) return;
+            if (target.tagName === 'TD' && !target.querySelector('.tooltip-trigger')) {
+                const radioToCheck = target.querySelector('input[type="radio"]');
+                if (radioToCheck && !radioToCheck.checked) {
+                    radioToCheck.checked = true;
+                    radioToCheck.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+        });
+        setupMobileTooltips();
+    }
+    function handleRadioChange(radioElement) {
+        calculateScore();
+        highlightSelectedRow(radioElement);
+    }
+    function setupMobileTooltips() {
+    if (!tableBody) return;
+    // Hàm đóng tất cả tooltip khác
+    function closeOtherMobileTooltips(excludeTooltip = null) {
+        const allVisibleTooltips = tableBody.querySelectorAll('.tooltip-text.mobile-visible');
+        allVisibleTooltips.forEach(tooltip => {
+            if (tooltip !== excludeTooltip) {
+                tooltip.classList.remove('mobile-visible');
+                const trigger = tooltip.previousElementSibling;
+                if (trigger && trigger.classList.contains('tooltip-trigger')) {
+                    trigger.setAttribute('aria-expanded', 'false');
+                }
+            }
+        });
+    }
+    // Hàm toggle tooltip
+    function toggleTooltip(trigger, tooltipText) {
+        const isCurrentlyVisible = tooltipText.classList.contains('mobile-visible');
+        closeOtherMobileTooltips(tooltipText);
+        tooltipText.classList.toggle('mobile-visible');
+        const newAriaExpandedState = tooltipText.classList.contains('mobile-visible');
+        trigger.setAttribute('aria-expanded', newAriaExpandedState);
+    }
+    // Xử lý sự kiện touchstart trên mobile
+    tableBody.addEventListener('touchstart', function(event) {
+        const trigger = event.target.closest('.tooltip-trigger');
+        if (!trigger) return;
+        const mobileMaxWidth = 767;
+        const isMobileView = window.innerWidth <= mobileMaxWidth;
+        if (!isMobileView) return;
+        event.preventDefault(); // Ngăn sự kiện click mô phỏng
+        event.stopPropagation(); // Ngăn nổi bọt lên td
+        const tooltipText = trigger.nextElementSibling;
+        if (tooltipText && tooltipText.classList.contains('tooltip-text')) {
+            toggleTooltip(trigger, tooltipText);
+        } else {
+            console.warn('Không tìm thấy .tooltip-text liền kề cho trigger:', trigger);
+        }
+    }, { passive: false }); // Bỏ passive để cho phép preventDefault
+    // Xử lý sự kiện click cho desktop (nếu cần)
+    tableBody.addEventListener('click', function(event) {
+        const trigger = event.target.closest('.tooltip-trigger');
+        if (!trigger) return;
+        const mobileMaxWidth = 767;
+        const isMobileView = window.innerWidth <= mobileMaxWidth;
+        if (isMobileView) return; // Bỏ qua click trên mobile
+        event.stopPropagation();
+        const tooltipText = trigger.nextElementSibling;
+        if (tooltipText && tooltipText.classList.contains('tooltip-text')) {
+            toggleTooltip(trigger, tooltipText);
+        }
+    });
+    // Đóng tooltip khi click ra ngoài trên mobile
+    document.addEventListener('touchstart', (event) => {
+        const mobileMaxWidth = 767;
+        if (window.innerWidth > mobileMaxWidth) return;
+        if (!event.target.closest('.tooltip-trigger') && !event.target.closest('.tooltip-text')) {
+            closeOtherMobileTooltips();
+        }
+    }, { passive: true });
+    // Đóng tooltip khi resize sang desktop
+    window.addEventListener('resize', () => {
+        const mobileMaxWidth = 767;
+        const isMobileView = window.innerWidth <= mobileMaxWidth;
+        if (!isMobileView) {
+            closeOtherMobileTooltips();
+        }
+    });
+    console.log("Đã thiết lập listener cải tiến cho tooltip mobile (touchstart) và desktop (click).");
+}
+    window.addEventListener('resize', () => {
+        const mobileMaxWidth = 767;
+        const isMobileView = window.innerWidth <= mobileMaxWidth;
+        if (!isMobileView) {
+            closeOtherMobileTooltips();
+        }
+    });
+    function generateCurrentPageQRCode() {
+        var qrCodeOutputElement = document.getElementById("qrcode-output");
+        if (!qrCodeOutputElement) { console.error('Placeholder "qrcode-output" not found.'); return; }
+        qrCodeOutputElement.innerHTML = "";
+        var currentURL = window.location.href;
+        try {
+            var qrcode = new QRCode(qrCodeOutputElement, {
+                text: currentURL,
+                width: 150,
+                height: 150,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            console.log('QR Code generated for URL:', currentURL);
+        } catch (error) {
+            console.error('Error generating QR Code:', error);
+            qrCodeOutputElement.innerHTML = "Lỗi tạo QR.";
+        }
+    }
+</script>
 <script>
 (function() {
     let lastSentHeight = 0;

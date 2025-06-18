@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thang Đánh Giá ADHD IV - Phiên Bản Tiền Học Đường (Cải tiến)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- TOÀN BỘ PHẦN CSS NGOẠI TRỪ @media print GIỮ NGUYÊN NHƯ BAN ĐẦU --- */
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .container {
+            max-width: 850px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 22px;
+            color: #0056b3;
+            margin-bottom: 25px;
+        }
+        .info-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+        .info-section label {
+            display: inline-block;
+            width: 150px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            vertical-align: middle;
+        }
+        .info-section input[type="text"],
+        .info-section input[type="number"] {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .info-section input[type="text"]:focus,
+        .info-section input[type="number"]:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        .info-section input[type="radio"] {
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        .info-section .gender-label {
+            margin-left: 15px;
+            width: auto;
+            font-weight: normal;
+        }
+        .info-display {
+            display: none; /* Ẩn mặc định, chỉ hiện khi lưu ảnh hoặc in (nếu cần) */
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            line-height: 1.6;
+        }
+        .info-display label {
+            font-weight: bold;
+            color: #495057;
+            margin-right: 5px;
+        }
+        .info-display span {
+            margin-left: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            table-layout: fixed;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 12px 10px;
+            text-align: center;
+            vertical-align: middle;
+            word-wrap: break-word;
+        }
+        th:first-child, td:first-child {
+            width: 45%;
+            text-align: left;
+            position: relative; /* Cho tooltip */
+        }
+        th:not(:first-child), td:not(:first-child) {
+            width: 13.75%;
+        }
+        th {
+            background-color: #e9ecef;
+            font-weight: 500;
+            color: #495057;
+        }
+        tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+        td {
+            cursor: pointer;
+        }
+        td input[type="radio"] {
+            cursor: pointer;
+        }
+        .selected-row {
+            background-color: #cfe2ff !important;
+            font-weight: 500;
+        }
+        /* Cải thiện Tooltip */
+        td:first-child:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 105%;
+            background-color: #343a40;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            width: 350px;
+            z-index: 10;
+            white-space: pre-wrap;
+            font-size: 13px;
+            line-height: 1.5;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+        td:first-child:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- CSS ĐÃ CẬP NHẬT CHO BUTTONS --- */
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .buttons button {
+            padding: 12px 25px;
+            margin: 0 15px;
+            cursor: pointer;
+            background-color: #007bff; /* Màu xanh mặc định */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .buttons button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .buttons button:last-child {
+            background-color: #6c757d; /* Màu xám */
+        }
+        .buttons button:last-child:hover {
+            background-color: #5a6268;
+        }
+        /* --- KẾT THÚC CSS CẬP NHẬT CHO BUTTONS --- */
+
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #cfe2ff;
+            border-radius: 5px;
+            background-color: #e7f1ff;
+            display: none; /* Ẩn ban đầu */
+        }
+        #result h3 {
+            margin-top: 0;
+            color: #0056b3;
+            margin-bottom: 15px;
+        }
+        #result p {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+        #result span {
+            font-weight: bold;
+            color: #d63384;
+        }
+        .input-form {
+            display: block; /* Hiện form nhập liệu mặc định */
+        }
+
+        /* --- CSS Stacking Layout cho Bảng trên Mobile (GIỮ NGUYÊN) --- */
+        @media screen and (max-width: 767px) {
+            table thead { display: none; }
+            table, tbody, tr, td { display: block; width: 100% !important; box-sizing: border-box; }
+            table { border: none; }
+            tr { border: 1px solid #ccc; border-radius: 5px; margin-bottom: 20px; padding: 0; background-color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+            td { border: none; border-bottom: 1px dotted #eee; padding: 10px 10px 10px 50%; position: relative; min-height: 40px; display: flex; align-items: center; justify-content: flex-end; text-align: right; }
+            td:last-of-type { border-bottom: none; }
+            td::before { content: attr(data-label); position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: calc(50% - 20px); white-space: normal; text-align: left; font-weight: bold; color: #333; font-size: 13px; }
+            td:first-child { padding: 12px 10px; text-align: left; font-weight: bold; font-size: 1.05em; background-color: #f8f9fa; border-bottom: 1px solid #ccc; display: block; border-top-left-radius: 5px; border-top-right-radius: 5px; }
+            td:first-child::before { display: none; }
+            td input[type="radio"] { margin-left: 5px; transform: scale(1.1); }
+            td:first-child:hover::after { display: none !important; }
+            .selected-row { background-color: transparent !important; font-weight: normal; }
+        }
+        /* --- Hết CSS Stacking Layout --- */
+
+        /* --- CSS CHO BẢN IN (ĐÃ CẬP NHẬT THEO YÊU CẦU) --- */
+        @media print {
+            body {
+                background-color: #fff;
+                font-size: 10pt;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                margin: 15mm; /* Thêm lề trang in */
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+                margin: 0;
+                max-width: 100%;
+                border: none;
+            }
+
+            /* --- ẨN CÁC PHẦN TỬ KHÔNG MONG MUỐN KHI IN --- */
+            .buttons,                  /* Ẩn nút bấm */
+            .input-form,               /* Ẩn form nhập liệu */
+            .info-section,             /* Ẩn toàn bộ khu vực thông tin trẻ */
+            #table-intro {             /* Ẩn đoạn giới thiệu trước bảng */
+                display: none !important;
+            }
+             td:first-child::after {   /* Ẩn tooltip khi in */
+                 display: none !important;
+             }
+
+             /* --- ĐẢM BẢO CÁC PHẦN TỬ MONG MUỐN HIỂN THỊ VÀ ĐỊNH DẠNG LẠI --- */
+             h1 { /* Tiêu đề */
+                 display: block !important;
+                 font-size: 16pt;
+                 margin-bottom: 15px;
+                 text-align: center;
+                 color: #000 !important;
+             }
+
+             table { /* Bảng biểu */
+                 display: table !important;
+                 width: 100% !important; /* Đảm bảo bảng chiếm đủ rộng */
+                 border-collapse: collapse !important;
+                 margin-bottom: 15px;
+                 page-break-inside: auto; /* Cho phép ngắt trang trong bảng nếu cần */
+             }
+             thead {
+                 display: table-header-group !important; /* Hiển thị header trên mỗi trang nếu bảng dài */
+             }
+             tbody {
+                 display: table-row-group !important;
+             }
+             tr {
+                 display: table-row !important;
+                 page-break-inside: avoid; /* Tránh ngắt trang giữa chừng một hàng */
+                 page-break-after: auto;
+             }
+             th, td {
+                 display: table-cell !important;
+                 border: 1px solid #000 !important;
+                 font-size: 9pt;
+                 padding: 5px;
+                 vertical-align: middle;
+                 text-align: center; /* Reset text-align cho các ô */
+                 background-color: transparent !important; /* Reset background */
+             }
+             th {
+                 font-weight: bold;
+                 background-color: #eee !important; /* Nền xám nhạt cho header */
+             }
+             td:first-child { /* Cột câu hỏi */
+                 text-align: left !important;
+                 width: 40% !important; /* Điều chỉnh lại độ rộng cột khi in */
+             }
+             th:not(:first-child),
+             td:not(:first-child) {
+                 width: 15% !important; /* Điều chỉnh lại độ rộng cột điểm */
+             }
+             .selected-row { /* Bỏ highlight hàng đã chọn khi in */
+                 background-color: #fff !important;
+                 font-weight: normal !important;
+             }
+
+             /* --- Hiển thị dấu tick thay cho radio --- */
+             td:has(> input[type="radio"]) {
+                 position: relative;
+                 height: 20px; /* Đảm bảo ô có chiều cao */
+             }
+             td input[type="radio"] { /* Ẩn radio gốc */
+                 position: absolute;
+                 opacity: 0;
+                 width: 1px; height: 1px;
+                 overflow: hidden; clip: rect(0 0 0 0);
+                 white-space: nowrap; margin: -1px;
+                 padding: 0; border: 0;
+             }
+             td:has(> input[type="radio"]:checked)::after { /* Hiện dấu tick nếu được chọn */
+                 content: '✔';
+                 position: absolute;
+                 top: 50%; left: 50%;
+                 transform: translate(-50%, -50%);
+                 font-size: 14pt; /* Kích thước dấu tick */
+                 font-weight: bold;
+                 color: #000;
+                 display: block;
+                 line-height: 1;
+             }
+
+             #result { /* Phần Kết quả */
+                 display: block !important;
+                 border: 1px solid #000 !important;
+                 background-color: transparent !important;
+                 margin-top: 15px;
+                 padding: 10px;
+                 page-break-before: auto; /* Cho phép ngắt trang trước kết quả nếu cần */
+             }
+             #result h3 {
+                 font-size: 12pt;
+                 font-weight: bold;
+                 color: #000 !important;
+                 margin-bottom: 10px;
+             }
+             #result p {
+                 font-size: 10pt;
+                 margin: 5px 0;
+                 color: #000 !important;
+             }
+             #result span {
+                 font-weight: bold;
+                 color: #000 !important;
+             }
+
+             #reference-section { /* Phần Tham chiếu */
+                 display: block !important;
+                 border-top: 1px solid #000 !important;
+                 margin-top: 20px;
+                 padding-top: 10px;
+                 page-break-before: auto; /* Cho phép ngắt trang trước tham chiếu */
+             }
+             #reference-section h4 {
+                 font-size: 12pt;
+                 font-weight: bold;
+                 color: #000 !important;
+                 margin-bottom: 5px;
+             }
+             #reference-section p {
+                 font-size: 9pt;
+                 font-style: italic;
+                 color: #333 !important;
+                 margin-bottom: 10px;
+             }
+              #reference-section > div { /* Reset flex layout */
+                  display: block !important; /* Stack các box lại */
+              }
+             #reference-section > div > div { /* Định dạng lại các box con */
+                 border: 1px solid #ccc !important;
+                 padding: 8px;
+                 margin-bottom: 10px;
+                 background-color: transparent !important;
+             }
+             #reference-section h5 {
+                 font-size: 10pt;
+                 font-weight: bold;
+                 text-align: left;
+                 color: #000 !important;
+                 margin-top: 0;
+                 margin-bottom: 5px;
+             }
+             #reference-section ul {
+                 padding-left: 20px; /* Thụt lề danh sách */
+                 margin: 5px 0;
+             }
+             #reference-section li {
+                 font-size: 9pt;
+                 color: #000 !important;
+                 margin-bottom: 3px;
+             }
+
+             #qr-code-section { /* Phần QR Code */
+                 display: block !important;
+                 border-top: 1px solid #000 !important;
+                 margin-top: 20px;
+                 padding-top: 10px;
+                 text-align: center;
+                 page-break-before: auto; /* Cho phép ngắt trang trước QR */
+             }
+             #qr-code-section h4 {
+                 font-size: 11pt;
+                 color: #000 !important;
+                 margin-bottom: 5px;
+             }
+             #qr-code-section p {
+                 font-size: 9pt;
+                 color: #555 !important; /* Màu chữ nhạt hơn chút */
+                 margin-bottom: 10px;
+             }
+             #qrcode-output { /* Định dạng QR code */
+                 width: 100px !important; /* Giảm kích thước QR */
+                 height: 100px !important;
+                 margin: 10px auto !important;
+                 padding: 0 !important;
+                 border: none !important;
+             }
+             #qrcode-output img { /* Đảm bảo ảnh QR co giãn đúng */
+                 width: 100% !important;
+                 height: 100% !important;
+                 display: block; /* Tránh khoảng trắng thừa */
+             }
+        }
+        /* --- KẾT THÚC CSS CHO BẢN IN --- */
+
+    </style>
+</head>
+<body>
+
+    <div class="container" id="form-container">
+        <h1>Thang Đánh Giá ADHD IV – Phiên Bản Tiền Học Đường</h1>
+
+        <div class="info-section">
+            <div class="input-form">
+                <div>
+                    <label for="child-name-input">Tên Trẻ:</label>
+                    <input type="text" id="child-name-input" style="width: 250px;">
+                </div>
+                <div>
+                    <label for="age-input">Tuổi:</label>
+                    <input type="number" id="age-input" style="width: 70px;" min="1">
+                </div>
+                <div>
+                    <label>Giới tính:</label>
+                    <input type="radio" name="gender" id="gender-male" value="Nam">
+                    <label for="gender-male" class="gender-label">Nam</label>
+                    <input type="radio" name="gender" id="gender-female" value="Nữ">
+                    <label for="gender-female" class="gender-label">Nữ</label>
+                </div>
+                <div>
+                    <label for="completed-by-input">Người Hoàn Thành:</label>
+                    <input type="text" id="completed-by-input" style="width: 250px;">
+                </div>
+                <div>
+                    <label for="relationship-input">Quan Hệ:</label>
+                    <input type="text" id="relationship-input" style="width: 250px;">
+                </div>
+            </div>
+            <div class="info-display"> <label>Tên Trẻ:</label><span id="child-name"></span><br>
+                <label>Tuổi:</label><span id="age"></span><br>
+                <label>Giới tính:</label><span id="gender"></span><br>
+                <label>Người Hoàn Thành:</label><span id="completed-by"></span><br>
+                <label>Quan Hệ:</label><span id="relationship"></span>
+            </div>
+        </div>
+
+        <p id="table-intro" style="margin-bottom: 15px; text-align: center; font-style: italic;">Khoanh tròn số mô tả đúng nhất hành vi của trẻ trong 6 tháng qua.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Hành vi</th>
+                    <th>Hiếm khi hoặc không bao giờ (0)</th>
+                    <th>Thỉnh thoảng (1)</th>
+                    <th>Thường xuyên (2)</th>
+                    <th>Rất thường xuyên (3)</th>
+                </tr>
+            </thead>
+            <tbody id="questions-body">
+                <tr><td colspan="5" style="text-align: center;">Đang tải câu hỏi...</td></tr>
+            </tbody>
+        </table>
+
+        <div id="result">
+            <h3>Kết quả đánh giá:</h3>
+            <p>Tổng điểm Giảm chú ý (Câu 1, 3, 5, 7, 9, 11, 13, 15, 17): <span id="odd-score">0</span></p>
+            <p>Tổng điểm Tăng động/Xung động (Câu 2, 4, 6, 8, 10, 12, 14, 16, 18): <span id="even-score">0</span></p>
+            <p>Tổng điểm 18 đề mục: <span id="total-score">0</span></p>
+        </div>
+
+        <div id="reference-section" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #ccc;">
+            <h4>Thông tin Tham chiếu - Ngưỡng Nghi ngờ ADHD (Phân vị thứ 93)</h4>
+            <p style="font-style: italic; color: #555; margin-bottom: 15px;">
+                <strong>Lưu ý quan trọng:</strong> Điểm số bằng hoặc vượt ngưỡng phân vị thứ 93 gợi ý cần đánh giá thêm, nhưng <strong>không phải là chẩn đoán xác định</strong> ADHD ở trẻ mẫu giáo...
+            </p>
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-around;">
+                 <div style="border: 1px solid #cfe2ff; padding: 15px; border-radius: 5px; background-color: #f8f9fa; min-width: 280px;">
+                     <h5 style="margin-top: 0; text-align: center; color: #0056b3;">Ngưỡng điểm cho Bé Trai (≥ Phân vị 93)</h5>
+                     <div><strong>Đánh giá bởi Phụ huynh:</strong><ul><li>Giảm chú ý (Điểm lẻ): ≥ <strong>14</strong></li><li>Tăng động/Xung động (Điểm chẵn): ≥ <strong>17</strong></li><li>Tổng điểm: ≥ <strong>32</strong></li></ul></div>
+                     <div style="margin-top: 10px;"><strong>Đánh giá bởi Giáo viên:</strong><ul><li>Giảm chú ý (Điểm lẻ): ≥ <strong>18</strong></li><li>Tăng động/Xung động (Điểm chẵn): ≥ <strong>22</strong></li><li>Tổng điểm: ≥ <strong>38</strong></li></ul></div>
+                 </div>
+                 <div style="border: 1px solid #cfe2ff; padding: 15px; border-radius: 5px; background-color: #f8f9fa; min-width: 280px;">
+                     <h5 style="margin-top: 0; text-align: center; color: #d63384;">Ngưỡng điểm cho Bé Gái (≥ Phân vị 93)</h5>
+                      <div><strong>Đánh giá bởi Phụ huynh:</strong><ul><li>Giảm chú ý (Điểm lẻ): ≥ <strong>12</strong></li><li>Tăng động/Xung động (Điểm chẵn): ≥ <strong>14</strong></li><li>Tổng điểm: ≥ <strong>24</strong></li></ul></div>
+                     <div style="margin-top: 10px;"><strong>Đánh giá bởi Giáo viên:</strong><ul><li>Giảm chú ý (Điểm lẻ): ≥ <strong>11</strong></li><li>Tăng động/Xung động (Điểm chẵn): ≥ <strong>13</strong></li><li>Tổng điểm: ≥ <strong>24</strong></li></ul></div>
+                 </div>
+            </div>
+        </div>
+
+         <div id="qr-code-section" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
+            <h4>Mã QR để truy cập trang này</h4>
+            <p style="font-size: 0.9em; color: #666;">Quét mã này bằng điện thoại để mở trang trên thiết bị di động hoặc chia sẻ.</p>
+            <div id="qrcode-output" style="width: 160px; height: 160px; margin: 15px auto; padding: 5px; border: 0px solid #ccc;">
+                </div>
+        </div>
+
+
+        <div class="buttons">
+            <button id="print-score-button" onclick="printResult()">In Kết Quả</button>
+            <button id="save-image-button" onclick="saveAsImage()">Lưu Ảnh Kết Quả</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+    <script>
+        // --- TOÀN BỘ PHẦN JAVASCRIPT HIỆN CÓ GIỮ NGUYÊN ---
+        const childNameInput = document.getElementById('child-name-input');
+        const ageInput = document.getElementById('age-input');
+        const genderRadios = document.querySelectorAll('input[name="gender"]');
+        const completedByInput = document.getElementById('completed-by-input');
+        const relationshipInput = document.getElementById('relationship-input');
+
+        const childNameDisplay = document.getElementById('child-name');
+        const ageDisplay = document.getElementById('age');
+        const genderDisplay = document.getElementById('gender');
+        const completedByDisplay = document.getElementById('completed-by');
+        const relationshipDisplay = document.getElementById('relationship');
+
+        const resultDiv = document.getElementById('result');
+        const oddScoreSpan = document.getElementById('odd-score');
+        const evenScoreSpan = document.getElementById('even-score');
+        const totalScoreSpan = document.getElementById('total-score');
+        const formContainer = document.getElementById('form-container');
+        let tableBody; // Sẽ được gán giá trị trong DOMContentLoaded
+
+        // Event listeners cho phần thông tin trẻ (giữ nguyên)
+        childNameInput.addEventListener('input', () => { childNameDisplay.textContent = childNameInput.value || ''; });
+        ageInput.addEventListener('input', () => { ageDisplay.textContent = ageInput.value || ''; });
+        genderRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (radio.checked) { genderDisplay.textContent = radio.value; }
+            });
+        });
+        completedByInput.addEventListener('input', () => { completedByDisplay.textContent = completedByInput.value || ''; });
+        relationshipInput.addEventListener('input', () => { relationshipDisplay.textContent = relationshipInput.value || ''; });
+
+        // Hàm highlight (giữ nguyên)
+        function highlightSelectedRow(selectedRadio) {
+             if (!tableBody) return;
+            tableBody.querySelectorAll('tr').forEach(row => {
+                row.classList.remove('selected-row');
+            });
+            const parentRow = selectedRadio.closest('tr');
+            if (parentRow) {
+                parentRow.classList.add('selected-row');
+            }
+        }
+
+        // Hàm tính điểm (giữ nguyên)
+        function calculateScore() {
+            let oddScore = 0, evenScore = 0, totalScore = 0, answeredCount = 0;
+            const questionCount = tableBody ? tableBody.querySelectorAll('tr').length : 0;
+
+            for (let i = 1; i <= questionCount; i++) {
+                let selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected) {
+                    let value = parseInt(selected.value);
+                    if (i % 2 === 1) { oddScore += value; }
+                    else { evenScore += value; }
+                    totalScore += value;
+                    answeredCount++;
+                }
+            }
+            oddScoreSpan.textContent = oddScore;
+            evenScoreSpan.textContent = evenScore;
+            totalScoreSpan.textContent = totalScore;
+            resultDiv.style.display = answeredCount > 0 ? 'block' : 'none'; // Hiển thị kết quả nếu có câu trả lời
+        }
+
+        // Hàm kiểm tra hoàn thành (cập nhật để đếm số câu thực tế)
+        function checkCompletion() {
+            const questionCount = tableBody ? tableBody.querySelectorAll('tr').length : 0;
+             if (questionCount === 0) return false; // Chưa tải xong
+            for (let i = 1; i <= questionCount; i++) {
+                if (!document.querySelector(`input[name="q${i}"]:checked`)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Hàm in (KHÔNG CẦN THAY ĐỔI - CSS @media print sẽ xử lý việc hiển thị)
+        function printResult() {
+            if (!checkCompletion()) {
+                alert('Vui lòng hoàn thành tất cả câu hỏi trước khi in kết quả!');
+                return;
+            }
+            // Cập nhật thông tin lần cuối (chủ yếu cho saveAsImage, không ảnh hưởng nhiều đến print)
+            childNameDisplay.textContent = childNameInput.value || 'Chưa nhập';
+            ageDisplay.textContent = ageInput.value || 'Chưa nhập';
+            const checkedGender = document.querySelector('input[name="gender"]:checked');
+            genderDisplay.textContent = checkedGender ? checkedGender.value : 'Chưa chọn';
+            completedByDisplay.textContent = completedByInput.value || 'Chưa nhập';
+            relationshipDisplay.textContent = relationshipInput.value || 'Chưa nhập';
+
+            // Gọi hàm in của trình duyệt, CSS @media print sẽ áp dụng
+            window.print();
+        }
+
+        // Hàm lưu ảnh (giữ nguyên)
+        function saveAsImage() {
+            if (!checkCompletion()) {
+                alert('Vui lòng hoàn thành tất cả câu hỏi trước khi lưu ảnh kết quả!');
+                return;
+            }
+            // Cập nhật thông tin lần cuối
+            childNameDisplay.textContent = childNameInput.value || 'Chưa nhập';
+            ageDisplay.textContent = ageInput.value || 'Chưa nhập';
+            const checkedGender = document.querySelector('input[name="gender"]:checked');
+            genderDisplay.textContent = checkedGender ? checkedGender.value : 'Chưa chọn';
+            completedByDisplay.textContent = completedByInput.value || 'Chưa nhập';
+            relationshipDisplay.textContent = relationshipInput.value || 'Chưa nhập';
+
+            const buttonsDiv = document.querySelector('.buttons');
+            const inputFormDiv = document.querySelector('.input-form');
+            const infoDisplayDiv = document.querySelector('.info-display');
+            const tableIntroP = document.getElementById('table-intro');
+
+            // --- TẠM ẨN/HIỆN CÁC PHẦN TỬ ĐỂ CHỤP ẢNH ĐẸP HƠN ---
+            buttonsDiv.style.display = 'none';        // Ẩn nút
+            inputFormDiv.style.display = 'none';      // Ẩn form nhập
+            infoDisplayDiv.style.display = 'block';   // Hiện thông tin tóm tắt
+            tableIntroP.style.display = 'none';       // Ẩn dòng giới thiệu bảng
+
+            // (Optional) Có thể thêm style tạm thời khác nếu cần cho ảnh
+            // Ví dụ: formContainer.style.boxShadow = 'none';
+
+            html2canvas(formContainer, {
+                 scale: 1.5,
+                 useCORS: true,
+                 // Bỏ qua các phần tử không cần trong ảnh (ví dụ: tooltip nếu nó đang hiện)
+                 ignoreElements: (element) => {
+                      // Có thể thêm logic phức tạp hơn ở đây nếu cần
+                      return false;
+                 }
+             })
+                .then(canvas => {
+                    let link = document.createElement('a');
+                    const childName = childNameInput.value.trim().replace(/\s+/g, '_') || 'Tre';
+                    const date = new Date();
+                    const dateString = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
+                    link.download = `ADHD_DanhGia_${childName}_${dateString}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+
+                    // --- KHÔI PHỤC HIỂN THỊ SAU KHI CHỤP ---
+                    buttonsDiv.style.display = 'block';
+                    inputFormDiv.style.display = 'block';
+                    infoDisplayDiv.style.display = 'none';
+                    tableIntroP.style.display = 'block';
+                   // formContainer.style.boxShadow = ''; // Khôi phục style nếu đã thay đổi
+                }).catch(err => {
+                    console.error("Lỗi khi tạo ảnh:", err);
+                    alert("Đã có lỗi xảy ra khi tạo ảnh kết quả.");
+                    // --- KHÔI PHỤC HIỂN THỊ NẾU CÓ LỖI ---
+                    buttonsDiv.style.display = 'block';
+                    inputFormDiv.style.display = 'block';
+                    infoDisplayDiv.style.display = 'none';
+                    tableIntroP.style.display = 'block';
+                    // formContainer.style.boxShadow = '';
+                });
+        }
+        // --- KẾT THÚC PHẦN HÀM HIỆN CÓ ---
+
+
+        // --- PHẦN MÃ MỚI/CẬP NHẬT ĐỂ TẢI DỮ LIỆU TỪ APPS SCRIPT (GIỮ NGUYÊN) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            tableBody = document.getElementById('questions-body'); // Gán giá trị tableBody
+
+            // !!! THAY THẾ URL NÀY BẰNG URL WEB APP CỦA BẠN !!!
+            const webAppUrl = 'https://script.google.com/macros/s/AKfycbxmYJwZcZVLdUchDSs35C5AJI6E2Yii0OKKji4MA3472okd2Kn544mU0-TVs5hXwrE/exec';
+            // Ví dụ: const webAppUrl = 'https://script.google.com/macros/s/AKfycby.../exec';
+
+            fetch(webAppUrl)
+                .then(response => {
+                    if (!response.ok) {
+                         return response.text().then(text => {
+                            throw new Error(`HTTP error! status: ${response.status}, message: ${text || 'Không có thông báo lỗi'}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(questionsData => {
+                     if (!Array.isArray(questionsData)) {
+                        console.error('Dữ liệu nhận được:', questionsData);
+                        throw new Error('Dữ liệu nhận được không phải là một mảng hợp lệ.');
+                    }
+                    if (questionsData.length > 0) {
+                        populateTable(questionsData);
+                        initializeEventListeners();
+                        calculateScore(); // Tính điểm ban đầu (sẽ là 0)
+                    } else {
+                        throw new Error('Không nhận được dữ liệu câu hỏi (mảng rỗng).');
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi tải hoặc xử lý dữ liệu câu hỏi từ Apps Script:', error);
+                    if (tableBody) {
+                        tableBody.innerHTML = `<tr><td colspan="5" style="color: red; text-align: center; padding: 20px;">
+                            <strong>Lỗi tải dữ liệu!</strong><br>
+                            Không thể tải danh sách câu hỏi từ Google Apps Script.<br>
+                            Vui lòng kiểm tra lại URL Web App trong mã nguồn và đảm bảo Apps Script được triển khai đúng cách (quyền truy cập "Anyone").<br>
+                            <small>Chi tiết lỗi: ${error.message}</small>
+                        </td></tr>`;
+                    }
+                });
+
+            // Tạo mã QR code (giữ nguyên logic)
+            generateCurrentPageQRCode();
+        });
+
+        // Hàm tạo bảng từ dữ liệu (CẬP NHẬT để thêm data-label - Giữ nguyên)
+        function populateTable(questions) {
+           if (!tableBody) return;
+           tableBody.innerHTML = ''; // Xóa "Đang tải..."
+
+           const headers = Array.from(document.querySelectorAll('table thead th')).map(th => th.textContent.trim());
+
+           questions.forEach((q, index) => {
+               const row = document.createElement('tr');
+               const questionNumber = index + 1;
+
+               const questionCell = document.createElement('td');
+               questionCell.textContent = q.question || `Câu hỏi ${questionNumber}`;
+               questionCell.setAttribute('data-tooltip', q.tooltip || 'Không có giải thích.');
+               row.appendChild(questionCell);
+
+               for (let i = 0; i <= 3; i++) {
+                   const radioCell = document.createElement('td');
+                   const radioInput = document.createElement('input');
+                   radioInput.type = 'radio';
+                   radioInput.name = `q${questionNumber}`;
+                   radioInput.value = i;
+                   radioCell.appendChild(radioInput);
+                   if (headers[i + 1]) {
+                       radioCell.setAttribute('data-label', headers[i + 1]);
+                   } else {
+                       radioCell.setAttribute('data-label', `Mức ${i}`);
+                   }
+                   row.appendChild(radioCell);
+               }
+               tableBody.appendChild(row);
+           });
+           console.log(`Đã tạo bảng với ${questions.length} câu hỏi và data-labels.`);
+         }
+
+        // Hàm gắn lại các sự kiện (giữ nguyên logic)
+        function initializeEventListeners() {
+             if (!tableBody) {
+                 console.error("Không tìm thấy tableBody để gắn listeners.");
+                 return;
+             }
+             // Listener cho click bảng (TD hoặc INPUT)
+             tableBody.addEventListener('click', function(e) {
+                 const target = e.target;
+                 if (target.tagName === 'TD' || (target.tagName === 'INPUT' && target.type === 'radio')) {
+                     let radioToCheck;
+                     let parentRow;
+
+                     if (target.tagName === 'TD') {
+                         radioToCheck = target.querySelector('input[type="radio"]');
+                         parentRow = target.parentElement;
+                         if (target === parentRow.cells[0]) return; // Bỏ qua click vào ô câu hỏi
+                     } else { // target là INPUT
+                         radioToCheck = target;
+                         parentRow = target.closest('tr');
+                     }
+
+                     if (radioToCheck && !radioToCheck.checked) {
+                         radioToCheck.checked = true;
+                         radioToCheck.dispatchEvent(new Event('change', { bubbles: true }));
+                     } else if (radioToCheck && radioToCheck.checked && target.tagName === 'TD') {
+                          radioToCheck.dispatchEvent(new Event('change', { bubbles: true }));
+                     }
+                 }
+             });
+
+             // Listener cho sự kiện change trên các radio
+             tableBody.querySelectorAll('input[type="radio"]').forEach(radio => {
+                 radio.addEventListener('change', handleRadioChange);
+             });
+             console.log("Đã khởi tạo event listeners cho bảng.");
+         }
+
+         // Hàm xử lý chung cho sự kiện change của radio (giữ nguyên)
+         function handleRadioChange(event) {
+             if (event.target.checked) { // Chỉ xử lý khi radio được check
+                 calculateScore();
+                 highlightSelectedRow(event.target);
+             }
+         }
+        // --- KẾT THÚC PHẦN MÃ TẢI DỮ LIỆU ---
+
+        // --- Mã QR Code (Giữ nguyên) ---
+        function generateCurrentPageQRCode() {
+            var qrCodeOutputElement = document.getElementById("qrcode-output");
+            if (!qrCodeOutputElement) {
+                console.error('Placeholder element "qrcode-output" not found.');
+                return;
+            }
+            qrCodeOutputElement.innerHTML = ""; // Xóa mã cũ
+            var currentURL = window.location.href;
+            try {
+                var qrcode = new QRCode(qrCodeOutputElement, {
+                    text: currentURL,
+                    width: 150, // Giữ kích thước hiển thị trên web
+                    height: 150,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                console.log('QR Code generated for URL:', currentURL);
+            } catch (error) {
+                console.error('Error generating QR Code:', error);
+                qrCodeOutputElement.innerHTML = "Lỗi khi tạo mã QR.";
+            }
+        }
+    </script>
+
+</body>
+</html>
